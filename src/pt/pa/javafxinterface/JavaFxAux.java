@@ -8,7 +8,8 @@ public class JavaFxAux {
     private static TextArea logArea;
     private static boolean timestampLog;
 
-    //TODO: Converter isto num sistema com ListView de String (mostrar 50 ou 100 logs mais recentes apenas!!)
+
+    //TODO: Converter isto num sistema com uma ListView de String (mostrar 50 ou 100 logs mais recentes apenas!!)
     public static void initLog(TextArea logArea, boolean withTimestamp) {
         JavaFxAux.logArea = logArea;
         JavaFxAux.timestampLog = withTimestamp;
