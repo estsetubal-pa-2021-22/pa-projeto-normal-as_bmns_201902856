@@ -41,6 +41,8 @@ public class MainPane extends BorderPane {
         initMenu();
         initLogBox();
 
+        centerBox.setAlignment(Pos.CENTER);
+
         this.setCenter(centerBox);
 
 
@@ -50,19 +52,24 @@ public class MainPane extends BorderPane {
         this.menuBar = new MenuBar();
 
         this.fileMenu = new Menu("File");
+        MenuItem importFileItem = new MenuItem("Import File");
+        MenuItem exportFileItem = new MenuItem("Export File");
         MenuItem quitItem = new MenuItem("Quit");
         quitItem.setOnAction(e -> System.exit(0));
-        fileMenu.getItems().addAll(quitItem);
+        fileMenu.getItems().addAll(importFileItem, exportFileItem, quitItem);
 
         this.editMenu = new Menu("Edit");
-
+        MenuItem addRouteItem = new MenuItem("Add Route");
+        MenuItem removeRouteItem = new MenuItem("Remove Route");
+        editMenu.getItems().addAll(addRouteItem, removeRouteItem);
 
         this.calculateMenu = new Menu("Calculate");
-        MenuItem testCalculate = new MenuItem("Test Calculate");
-        testCalculate.setOnAction(e -> {
-            for (int i = 0; i < 1000; i++) JavaFxAux.appendLog("" + i);
-        });
-        calculateMenu.getItems().addAll(testCalculate);
+        MenuItem amountOfHubsItem = new MenuItem("Amount of Hubs");
+        MenuItem amountOfRoutesItem = new MenuItem("Amount of Routes");
+        MenuItem hubCentralityItem = new MenuItem("Hub Centrality");
+        MenuItem top5HubsItem = new MenuItem("Top 5 Hubs");
+        MenuItem subNetworksItem = new MenuItem("Number of Logistic Sub-Networks");
+        calculateMenu.getItems().addAll(amountOfHubsItem, amountOfRoutesItem, hubCentralityItem, top5HubsItem, subNetworksItem);
 
         menuBar.getMenus().addAll(
                 fileMenu, editMenu, calculateMenu
