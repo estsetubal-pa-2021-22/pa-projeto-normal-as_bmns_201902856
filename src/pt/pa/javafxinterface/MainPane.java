@@ -23,7 +23,7 @@ public class MainPane extends BorderPane {
     private Label logTitle;
     private TextArea logArea;
 
-    private HBox centerBox;
+    private VBox centerBox;
 
     public MainPane() {
         this.whereGraphWillBe = new Label("Cenas Fixes e\nGrafos e Cenas");
@@ -34,17 +34,18 @@ public class MainPane extends BorderPane {
         whereGraphWillBe.setMinSize(GRAPH_WIDTH, GRAPH_HEIGHT);
         whereGraphWillBe.setMaxSize(GRAPH_WIDTH, GRAPH_HEIGHT);
 
-        this.centerBox = new HBox(5);
+        Label graphNameLbl = new Label("Visual Graph Implementation");
 
-        this.centerBox.getChildren().add(whereGraphWillBe);
+        this.centerBox = new VBox(5);
+
+        this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
+        this.centerBox.setAlignment(Pos.TOP_CENTER);
 
         initMenu();
         initLogBox();
 
-        centerBox.setAlignment(Pos.CENTER);
 
         this.setCenter(centerBox);
-
 
     }
 
@@ -88,8 +89,10 @@ public class MainPane extends BorderPane {
         logArea.setEditable(false);
 
         this.logBox = new VBox(5, logTitle, logArea);
+        this.logBox.setMaxWidth(300);
 
-        this.centerBox.getChildren().add(logBox);
+        this.setRight(logBox);
+        BorderPane.setMargin(logBox, new Insets(0, 20, 0, 0));
 
         JavaFxAux.initLog(logArea, true);
 

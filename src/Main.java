@@ -25,7 +25,8 @@ public class Main extends Application {
 
         System.out.println(route1);
 
-        Rectangle2D rect = Screen.getPrimary().getBounds();
+        //Rectangle2D rect = Screen.getPrimary().getBounds();
+        Rectangle2D rect = new Rectangle2D(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         double scale = 0.9;
 
         Scene scene = new Scene(new MainPane(), rect.getWidth() * scale, rect.getHeight() * scale);
