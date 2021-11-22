@@ -59,7 +59,7 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         MyEdge myEdge = checkEdge(e);
         if(myVertex.incidentEdges.contains(myEdge)){
             for (Vertex<V> ve: myEdge.vertices()) {
-                if(myEdge != (MyEdge) ve){
+                if(myVertex != (MyVertex) ve){
                     return ve;
                 }
             }
