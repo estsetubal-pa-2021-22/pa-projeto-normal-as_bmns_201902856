@@ -1,5 +1,9 @@
 package pt.pa.javafxinterface;
 
+import com.brunomnsilva.smartgraph.containers.SmartGraphDemoContainer;
+import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
+import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
+import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,12 +12,16 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import pt.pa.graph.Digraph;
+import pt.pa.graph.DigraphEdgeList;
+import pt.pa.graph.Graph;
 
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
 
-    private Label whereGraphWillBe;
+    public SmartGraphPanel<String, String> graphView;
+    private SmartGraphDemoContainer whereGraphWillBe;
     private MenuBar menuBar;
     private Menu fileMenu,
                  editMenu,
@@ -26,26 +34,15 @@ public class MainPane extends BorderPane {
     private VBox centerBox;
 
     public MainPane() {
-        this.whereGraphWillBe = new Label("Cenas Fixes e\nGrafos e Cenas");
-        whereGraphWillBe.setBackground(new Background(
-                new BackgroundFill(Color.BURLYWOOD, CornerRadii.EMPTY, Insets.EMPTY)
-        ));
 
-        whereGraphWillBe.setMinSize(GRAPH_WIDTH, GRAPH_HEIGHT);
-        whereGraphWillBe.setMaxSize(GRAPH_WIDTH, GRAPH_HEIGHT);
 
-        Label graphNameLbl = new Label("Visual Graph Implementation");
 
-        this.centerBox = new VBox(5);
-
-        this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
-        this.centerBox.setAlignment(Pos.TOP_CENTER);
 
         initMenu();
         initLogBox();
+        initGraph();
 
 
-        this.setCenter(centerBox);
 
     }
 
@@ -96,5 +93,64 @@ public class MainPane extends BorderPane {
 
         JavaFxAux.initLog(logArea, true);
 
+    }
+
+    private void initGraph() {
+        Graph<String, String> g = build_sample_digraph();
+        //Graph<String, String> g = build_flower_graph();
+        System.out.println(g);
+
+        SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
+        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
+        graphView = new SmartGraphPanel<>(g, strategy);
+
+        /*
+        After creating, you can change the styling of some element.
+        This can be done at any time afterwards.
+        */
+        if (g.numVertices() > 0) {
+            graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
+        }
+
+        Label graphNameLbl = new Label("Visual Graph Implementation");
+
+        whereGraphWillBe = new SmartGraphDemoContainer(graphView);
+        whereGraphWillBe.setMinSize(GRAPH_WIDTH, GRAPH_HEIGHT);
+        whereGraphWillBe.setMaxSize(GRAPH_WIDTH, GRAPH_HEIGHT);
+
+        this.centerBox = new VBox(5);
+
+        this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
+        this.centerBox.setAlignment(Pos.TOP_CENTER);
+
+        this.setCenter(centerBox);
+
+    }
+
+    private Graph<String, String> build_sample_digraph() {
+
+        Digraph<String, String> g = new DigraphEdgeList<>();
+
+        g.insertVertex("A");
+        g.insertVertex("B");
+        g.insertVertex("C");
+        g.insertVertex("D");
+        g.insertVertex("E");
+        g.insertVertex("F");
+
+        g.insertEdge("A", "B", "AB");
+        g.insertEdge("B", "A", "AB2");
+        g.insertEdge("A", "C", "AC");
+        g.insertEdge("A", "D", "AD");
+        g.insertEdge("B", "C", "BC");
+        g.insertEdge("C", "D", "CD");
+        g.insertEdge("B", "E", "BE");
+        g.insertEdge("F", "D", "DF");
+        g.insertEdge("F", "D", "DF2");
+
+        //yep, its a loop!
+        g.insertEdge("A", "A", "Loop");
+
+        return g;
     }
 }

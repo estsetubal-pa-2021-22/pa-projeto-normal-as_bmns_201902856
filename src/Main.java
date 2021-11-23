@@ -26,10 +26,12 @@ public class Main extends Application {
         System.out.println(route1);
 
         Rectangle2D rect = Screen.getPrimary().getBounds();
-        //Rectangle2D rect = new Rectangle2D(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        //Rectangle2D rect = new Rectangle2D(900, 900, 900, 900);
         double scale = 0.9;
 
-        Scene scene = new Scene(new MainPane(), rect.getWidth() * scale, rect.getHeight() * scale);
+        MainPane mainPane = new MainPane();
+
+        Scene scene = new Scene(mainPane, 1680, 900);
 
         Stage stage = new Stage(StageStyle.DECORATED);
         stage.setTitle("Projeto PA - Logistics Network");
@@ -38,6 +40,7 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        mainPane.graphView.init();
 
     }
 
