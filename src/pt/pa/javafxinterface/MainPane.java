@@ -15,6 +15,7 @@ import javafx.scene.text.TextAlignment;
 import pt.pa.graph.Digraph;
 import pt.pa.graph.DigraphEdgeList;
 import pt.pa.graph.Graph;
+import pt.pa.graph.GraphAdjacencyList;
 
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
@@ -129,7 +130,7 @@ public class MainPane extends BorderPane {
 
     private Graph<String, String> build_sample_digraph() {
 
-        Digraph<String, String> g = new DigraphEdgeList<>();
+        Graph<String, String> g = new GraphAdjacencyList<>();
 
         g.insertVertex("A");
         g.insertVertex("B");
