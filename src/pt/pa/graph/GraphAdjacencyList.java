@@ -63,6 +63,9 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
                     return ve;
                 }
             }
+            if (myEdge.vertices()[1] == myEdge.vertices()[0]){
+                return myEdge.vertices()[0];
+            }
         }
         return null;
     }
@@ -82,6 +85,7 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
     public Edge<E, V> insertEdge(Vertex<V> u, Vertex<V> v, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
         MyVertex myU =checkVertex(u);
         MyVertex myV =checkVertex(v);
+        //TODO: Fix the checks for throwing the exceptions
         if(myU.incidentEdges.contains(edgeElement)){
             throw new InvalidEdgeException("Edge already exists");
         }
@@ -202,7 +206,10 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
             if(adjacentVertices.isEmpty()) {
                 return new Vertex[]{null, null}; //edge was removed meanwhile
             } else {
-                return new Vertex[]{adjacentVertices.get(0), adjacentVertices.get(1)};
+                if(adjacentVertices.size() == 1){
+                    return new Vertex[]{adjacentVertices.get(0), adjacentVertices.get(0)};
+                }else{
+                    return new Vertex[]{adjacentVertices.get(0), adjacentVertices.get(1)};}
             }
         }
 
