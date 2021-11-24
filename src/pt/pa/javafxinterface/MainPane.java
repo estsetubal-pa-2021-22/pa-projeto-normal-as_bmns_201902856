@@ -131,6 +131,7 @@ public class MainPane extends BorderPane {
     private Graph<String, String> build_sample_digraph() {
 
         Graph<String, String> g = new GraphAdjacencyList<>();
+        //Digraph<String, String> g = new DigraphEdgeList<>();
 
         g.insertVertex("A");
         g.insertVertex("B");
