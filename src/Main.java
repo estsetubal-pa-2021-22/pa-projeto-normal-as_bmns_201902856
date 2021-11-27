@@ -5,9 +5,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pt.pa.graph.GraphAdjacencyList;
 import pt.pa.javafxinterface.MainPane;
 import pt.pa.model.Hub;
+import pt.pa.model.Matrix;
+import pt.pa.model.MatrixHashMap;
 import pt.pa.model.Route;
+import pt.pa.filemanaging.FileManager;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public class Main extends Application {
 
@@ -18,12 +25,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        Hub hub1 = new Hub("Generic City A", 100000, 123, 235);
-        Hub hub2 = new Hub("Generic City B", 123456, 234, 346);
-
-        Route route1 = new Route(hub1, hub2);
-
-        System.out.println(route1);
+        String prefix = "dataset/sgb128/";
+        GraphAdjacencyList<Hub, Route> testGraph = FileManager.graphFromFiles(
+                prefix + "name.txt",
+                prefix + "weight.txt",
+                prefix + "xy.txt",
+                prefix + "routes_1.txt"
+        );
+        System.out.println(testGraph);
 
         Rectangle2D rect = Screen.getPrimary().getBounds();
         //Rectangle2D rect = new Rectangle2D(900, 900, 900, 900);
