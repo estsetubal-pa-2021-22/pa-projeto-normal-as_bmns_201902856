@@ -4,6 +4,7 @@ import com.brunomnsilva.smartgraph.containers.SmartGraphDemoContainer;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
+import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,16 +13,16 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
-import pt.pa.graph.Digraph;
-import pt.pa.graph.DigraphEdgeList;
-import pt.pa.graph.Graph;
-import pt.pa.graph.GraphAdjacencyList;
+import pt.pa.filemanaging.FileManager;
+import pt.pa.graph.*;
+import pt.pa.model.Hub;
+import pt.pa.model.Route;
 
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
 
-    public SmartGraphPanel<String, String> graphView;
+    public SmartGraphPanel<Hub, Route> graphView;
     private SmartGraphDemoContainer whereGraphWillBe;
     private MenuBar menuBar;
     private Menu fileMenu,
@@ -97,20 +98,29 @@ public class MainPane extends BorderPane {
     }
 
     private void initGraph() {
-        Graph<String, String> g = build_sample_digraph();
+        String prefix = "dataset/sgb32/";
+        Graph<Hub, Route> g = FileManager.graphFromFiles(
+                prefix + "name.txt",
+                prefix + "weight.txt",
+                prefix + "xy.txt",
+                prefix + "routes_1.txt"
+        );
         //Graph<String, String> g = build_flower_graph();
         System.out.println(g);
 
         SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
         //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
-        graphView = new SmartGraphPanel<>(g, strategy);
+        graphView = new SmartGraphPanel<>(g);
+        for(Vertex<Hub> v: g.vertices()) {
+            graphView.setVertexPosition(v, v.element().getGuiX(), v.element().getGuiY());
+        }
 
         /*
         After creating, you can change the styling of some element.
         This can be done at any time afterwards.
         */
         if (g.numVertices() > 0) {
-            graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
+            //graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
         }
 
         Label graphNameLbl = new Label("Visual Graph Implementation");
@@ -122,7 +132,7 @@ public class MainPane extends BorderPane {
         this.centerBox = new VBox(5);
 
         this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
-        this.centerBox.setAlignment(Pos.TOP_CENTER);
+        this.centerBox.setAlignment(Pos.CENTER);
 
         this.setCenter(centerBox);
 
