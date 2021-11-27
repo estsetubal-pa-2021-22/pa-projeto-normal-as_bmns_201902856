@@ -4,6 +4,7 @@ public class Hub {
     private String name;
     private int population;
     private int guiX, guiY;
+    private final boolean SMALL_STRING = true;
 
     public Hub(String name, int population, int guiX, int guiY) {
         this.name = name;
@@ -67,12 +68,15 @@ public class Hub {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Hub {");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", population=").append(population);
-        sb.append(", position=(").append(guiX);
-        sb.append(", ").append(guiY);
-        sb.append(")}");
-        return sb.toString();
+        if(!SMALL_STRING) {
+            final StringBuilder sb = new StringBuilder("Hub {");
+            sb.append("name='").append(name).append('\'');
+            sb.append(", population=").append(population);
+            sb.append(", position=(").append(guiX);
+            sb.append(", ").append(guiY);
+            sb.append(")}");
+            return sb.toString();
+        }
+        return name;
     }
 }
