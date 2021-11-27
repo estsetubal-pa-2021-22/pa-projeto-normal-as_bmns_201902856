@@ -1,6 +1,5 @@
 #Ignore folders
 
-/test/
 /build/
 /dist/
 **/javadoc/

@@ -86,12 +86,18 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         MyVertex myU =checkVertex(u);
         MyVertex myV =checkVertex(v);
         //TODO: Fix the checks for throwing the exceptions
-        if(myU.incidentEdges.contains(edgeElement)){
-            throw new InvalidEdgeException("Edge already exists");
+        if(edgeElement == null) throw new InvalidEdgeException("Null edge.");
+
+        for (Edge<E,V> ed:myU.incidentEdges) {
+            if (ed.element() == edgeElement){
+                throw new InvalidEdgeException("Edge already exists");
+            }
         }
 
-        if(myV.incidentEdges.contains(edgeElement)){
-            throw new InvalidEdgeException("Edge already exists");
+        for (Edge<E,V> ed:myV.incidentEdges) {
+            if (ed.element() == edgeElement){
+                throw new InvalidEdgeException("Edge already exists");
+            }
         }
 
         MyEdge e = new MyEdge(edgeElement);
@@ -102,6 +108,8 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
 
     @Override
     public Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        if(edgeElement == null) throw new InvalidEdgeException("Null edge.");
+
         if(!vertices.containsKey(vElement1)){
             throw new InvalidVertexException("Vertex "+ vElement1 + " doesn't exists");
         }
@@ -119,7 +127,7 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         for (Edge<E,V> ed:myV.incidentEdges) {
             removeEdge(ed);
         }
-        vertices.remove(myV);
+        vertices.remove(myV.element);
         return myV.element;
     }
 
@@ -128,7 +136,8 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         MyEdge myE = checkEdge(e);
         for (Vertex<V> ve:myE.vertices()) {
             MyVertex vert = (MyVertex) ve;
-            vert.incidentEdges.remove(myE);
+            if(vert.incidentEdges.contains(myE)){
+                vert.incidentEdges.remove(myE);}
         }
         return myE.element;
     }
