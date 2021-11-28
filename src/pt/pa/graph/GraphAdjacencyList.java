@@ -88,14 +88,8 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         //TODO: Fix the checks for throwing the exceptions
         if(edgeElement == null) throw new InvalidEdgeException("Null edge.");
 
-        for (Edge<E,V> ed:myU.incidentEdges) {
-            if (ed.element() == edgeElement){
-                throw new InvalidEdgeException("Edge already exists");
-            }
-        }
-
         for (Edge<E,V> ed:myV.incidentEdges) {
-            if (ed.element() == edgeElement){
+            if (ed.element() == edgeElement && opposite(myV,ed) == myU){
                 throw new InvalidEdgeException("Edge already exists");
             }
         }
