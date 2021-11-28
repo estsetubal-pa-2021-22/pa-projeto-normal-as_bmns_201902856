@@ -1,8 +1,10 @@
 # Projeto PA - Época Normal
-
-
+### Desenvolvido por: 
+- André Lisboa (Líder): 201902856
+- Luís Fonseca: 202002179
+- Rafael Maria: 202001443
+- Afonso Semeano: 202001614
 ## 1ª Fase - Milestone
-
 
 Foi criada uma implementação de graph usando a estrutura de dados "lista de adjacências", que está implementada na classe
 GraphAdjacencyList.
