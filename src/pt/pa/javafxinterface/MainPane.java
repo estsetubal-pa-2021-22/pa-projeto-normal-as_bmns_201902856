@@ -111,9 +111,7 @@ public class MainPane extends BorderPane {
         SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
         //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
         graphView = new SmartGraphPanel<>(g);
-        for(Vertex<Hub> v: g.vertices()) {
-            graphView.setVertexPosition(v, v.element().getGuiX(), v.element().getGuiY());
-        }
+
 
         /*
         After creating, you can change the styling of some element.
@@ -136,6 +134,9 @@ public class MainPane extends BorderPane {
 
         this.setCenter(centerBox);
 
+        for(Vertex<Hub> v: g.vertices()) {
+            graphView.setVertexPosition(v, v.element().getGuiX(), v.element().getGuiY());
+        }
     }
 
     private Graph<String, String> build_sample_digraph() {

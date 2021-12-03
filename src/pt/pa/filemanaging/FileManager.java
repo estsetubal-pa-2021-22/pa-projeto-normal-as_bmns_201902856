@@ -16,6 +16,8 @@ import java.util.List;
 
 public class FileManager {
 
+    // TODO: Generate graph procedurally and not store the Matrix in memory (risk of OutOfMemoryError). Read by line!
+    // TODO: For each city from 0 to n - 1, check routes to the previously read hubs.
     public static GraphAdjacencyList<Hub, Route> graphFromFiles(
             String nameFile, String weightFile, String xyFile, String routesFile
     ){
