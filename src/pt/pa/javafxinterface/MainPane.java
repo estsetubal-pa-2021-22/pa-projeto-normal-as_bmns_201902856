@@ -5,23 +5,41 @@ import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrateg
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import pt.pa.commands.Command;
+import pt.pa.commands.CommandAdd;
+import pt.pa.commands.CommandHistory;
+import pt.pa.commands.CommandRemove;
 import pt.pa.filemanaging.FileManager;
 import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
 
-public class MainPane extends BorderPane {
+import java.awt.event.ActionListener;
+
+public class MainPane extends BorderPane{
+    private CommandHistory history = new CommandHistory();
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
-
+    public Graph<Hub, Route> g; //For Command
+    private Stage stage = new Stage(StageStyle.DECORATED);  //For add and Remove
+    public TextField nameHub1;//For add and Remove
+    public TextField nameHub2;//For add and Remove
     public SmartGraphPanel<Hub, Route> graphView;
     private SmartGraphDemoContainer whereGraphWillBe;
     private MenuBar menuBar;
@@ -50,7 +68,6 @@ public class MainPane extends BorderPane {
 
     private void initMenu() {
         this.menuBar = new MenuBar();
-
         this.fileMenu = new Menu("File");
         MenuItem importFileItem = new MenuItem("Import File");
         MenuItem exportFileItem = new MenuItem("Export File");
@@ -60,7 +77,35 @@ public class MainPane extends BorderPane {
 
         this.editMenu = new Menu("Edit");
         MenuItem addRouteItem = new MenuItem("Add Route");
+        addRouteItem.setOnAction(new EventHandler() {
+
+            /**
+             * Invoked when a specific event of the type for which this handler is
+             * registered happens.
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(Event event) {
+                //open new window
+                initWindowAdd();
+            }
+        });
         MenuItem removeRouteItem = new MenuItem("Remove Route");
+        removeRouteItem.setOnAction(new EventHandler() {
+
+            /**
+             * Invoked when a specific event of the type for which this handler is
+             * registered happens.
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(Event event) {
+                //open new window
+                initWindowRemove();
+            }
+        });
         editMenu.getItems().addAll(addRouteItem, removeRouteItem);
 
         this.calculateMenu = new Menu("Calculate");
@@ -77,7 +122,6 @@ public class MainPane extends BorderPane {
 
         this.setTop(menuBar);
     }
-
     private void initLogBox() {
         this.logTitle = new Label("Logs");
         logTitle.setAlignment(Pos.CENTER);
@@ -99,7 +143,7 @@ public class MainPane extends BorderPane {
 
     private void initGraph() {
         String prefix = "dataset/sgb32/";
-        Graph<Hub, Route> g = FileManager.graphFromFiles(
+        g = FileManager.graphFromFiles( //Change here test purposes
                 prefix + "name.txt",
                 prefix + "weight.txt",
                 prefix + "xy.txt",
@@ -165,5 +209,86 @@ public class MainPane extends BorderPane {
         g.insertEdge("A", "A", "Loop");
 
         return g;
+    }
+
+    private void executeCommand(Command command) {
+        if (command.execute()) {
+            history.push(command);
+        }
+    }
+
+    private void undo() {
+        if (history.isEmpty()) return;
+
+        Command command = history.pop();
+        if (command != null) {
+            command.undo();
+        }
+    }
+
+    private void initWindowAdd(){
+        MainPane pane = this;
+        Label Hub1 = new Label("Nome Hub1:");
+        Hub1.setFont(new Font(15));
+        nameHub1 = new TextField("nome hub");
+        HBox hub1 = new HBox();
+        hub1.getChildren().addAll(Hub1, nameHub1);
+        Hub1.setAlignment(Pos.CENTER_LEFT);
+        Label Hub2 = new Label("Nome Hub2:");
+        Hub2.setFont(new Font(15));
+        nameHub2 = new TextField("nome hub");
+        HBox hub2 = new HBox();
+        hub2.getChildren().addAll(Hub2, nameHub2);
+        Hub2.setAlignment(Pos.CENTER_LEFT);
+        Button addBtn = new Button("Add");
+        StackPane root=new StackPane();
+        VBox hub = new VBox();
+        hub.getChildren().addAll(hub1,hub2);
+        root.getChildren().addAll(hub,addBtn);
+        addBtn.setAlignment(Pos.BOTTOM_CENTER);
+        Scene scene = new Scene(root, 300, 150);
+        stage.setScene(scene);
+        stage.show();
+        addBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //execute add Command
+                executeCommand(new CommandAdd(pane));
+                stage.close();
+            }
+        });
+    }
+
+    private void initWindowRemove(){
+        MainPane pane = this;
+        Label Hub1 = new Label("Nome Hub1:");
+        Hub1.setFont(new Font(15));
+        TextField nameHub1 = new TextField("nome hub");
+        HBox hub1 = new HBox();
+        hub1.getChildren().addAll(Hub1, nameHub1);
+        Hub1.setAlignment(Pos.CENTER_LEFT);
+        Label Hub2 = new Label("Nome Hub2:");
+        Hub2.setFont(new Font(15));
+        TextField nameHub2 = new TextField("nome hub");
+        HBox hub2 = new HBox();
+        hub2.getChildren().addAll(Hub2, nameHub2);
+        Hub2.setAlignment(Pos.CENTER_LEFT);
+        Button remBtn = new Button("Remove");
+        StackPane root=new StackPane();
+        VBox hub = new VBox();
+        hub.getChildren().addAll(hub1,hub2);
+        root.getChildren().addAll(hub,remBtn);
+        remBtn.setAlignment(Pos.BOTTOM_CENTER);
+        Scene scene = new Scene(root, 300, 150);
+        stage.setScene(scene);
+        stage.show();
+        remBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //execute remove Command
+                executeCommand(new CommandRemove(pane));
+                stage.close();
+            }
+        });
     }
 }
