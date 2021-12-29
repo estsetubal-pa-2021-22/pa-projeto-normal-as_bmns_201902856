@@ -5,6 +5,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pt.pa.graph.Graph;
 import pt.pa.graph.GraphAdjacencyList;
 import pt.pa.javafxinterface.MainPane;
 import pt.pa.model.Hub;
@@ -26,7 +27,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         String prefix = "dataset/sgb128/";
-        GraphAdjacencyList<Hub, Route> testGraph = FileManager.graphFromFiles(
+        Graph<Hub, Route> testGraph = FileManager.graphFromFiles(
                 prefix + "name.txt",
                 prefix + "weight.txt",
                 prefix + "xy.txt",

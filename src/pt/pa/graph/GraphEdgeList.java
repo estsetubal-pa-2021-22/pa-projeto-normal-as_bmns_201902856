@@ -23,11 +23,10 @@
  */
 package pt.pa.graph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import pt.pa.model.Hub;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * ADT Graph implementation that stores a collection of edges (and vertices) and
@@ -278,6 +277,39 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
             sb.append("\t").append(e.toString()).append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public List<Vertex<V>> depthFirstSearch(Vertex<V> start) {
+        List<Vertex<V>> allTraversedVertices = new ArrayList<>();
+        Stack<Vertex<V>> stack = new Stack<>();
+
+        stack.push(start);
+        allTraversedVertices.add(start);
+
+        while(!stack.isEmpty()) {
+            Vertex<V> v = stack.pop();
+
+            for(Vertex<V> adjacent: getAdjacentVertices(v)) {
+                if(!allTraversedVertices.contains(adjacent)) {
+                    allTraversedVertices.add(adjacent);
+                    stack.push(adjacent);
+                }
+            }
+        }
+
+        return allTraversedVertices;
+    }
+
+    @Override
+    public List<Vertex<V>> getAdjacentVertices(Vertex<V> v) {
+        List<Vertex<V>> adjacent = new ArrayList<>();
+
+        for(Edge<E, V> e: incidentEdges(v)) {
+            adjacent.add(opposite(v, e));
+        }
+
+        return adjacent;
     }
 
     class MyVertex implements Vertex<V> {

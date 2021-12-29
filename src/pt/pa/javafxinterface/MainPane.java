@@ -5,18 +5,34 @@ import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrateg
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
+import pt.pa.Statistics;
 import pt.pa.filemanaging.FileManager;
 import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
@@ -35,17 +51,12 @@ public class MainPane extends BorderPane {
 
     private VBox centerBox;
 
+    private Graph<Hub, Route> g;
+
     public MainPane() {
-
-
-
-
+        initGraph();
         initMenu();
         initLogBox();
-        initGraph();
-
-
-
     }
 
     private void initMenu() {
@@ -63,12 +74,87 @@ public class MainPane extends BorderPane {
         MenuItem removeRouteItem = new MenuItem("Remove Route");
         editMenu.getItems().addAll(addRouteItem, removeRouteItem);
 
+        Statistics stats = new Statistics(g);
         this.calculateMenu = new Menu("Calculate");
         MenuItem amountOfHubsItem = new MenuItem("Amount of Hubs");
+        amountOfHubsItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Label amountOfHubsLabel = new Label("Amount of Hubs: " + stats.getAmountOfHubs());
+                showInformation(amountOfHubsLabel);
+            }
+        });
         MenuItem amountOfRoutesItem = new MenuItem("Amount of Routes");
+        amountOfRoutesItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Label amountOfRoutesLabel = new Label("Amount of Routes: " + stats.getAmountOfRoutes());
+                showInformation(amountOfRoutesLabel);
+            }
+        });
         MenuItem hubCentralityItem = new MenuItem("Hub Centrality");
+        hubCentralityItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                ObservableList<Statistics.HubWithAdjacents> obsAllHubWithAdjacents = FXCollections.observableArrayList(stats.getHubCentrality());
+                ListView<Statistics.HubWithAdjacents> listView = new ListView<>();
+                listView.setItems(obsAllHubWithAdjacents);
+                listView.setMaxWidth(380);
+                listView.setMaxHeight(450);
+
+                Label labelTitle = new Label("Hub Centrality");
+                labelTitle.setStyle("-fx-font-size: 20pt");
+
+                VBox vBox = new VBox();
+                vBox.getChildren().addAll(labelTitle, listView);
+                vBox.setAlignment(Pos.CENTER);
+
+                Scene newScene = new Scene(vBox, 430, 500);
+                Stage newWindow = new Stage();
+                newWindow.setTitle("Statistics");
+                newWindow.setScene(newScene);
+                newWindow.show();
+            }
+        });
         MenuItem top5HubsItem = new MenuItem("Top 5 Hubs");
+        top5HubsItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                CategoryAxis yAxis = new CategoryAxis();
+                NumberAxis xAxis = new NumberAxis();
+                BarChart<Number, String> chart = new BarChart<>(xAxis, yAxis);
+                chart.setTitle("Top 5 Hubs");
+                xAxis.setLabel("Amount of adjacent hubs");
+                xAxis.setTickLabelRotation(90);
+                yAxis.setLabel("Hubs");
+
+                XYChart.Series series = new XYChart.Series();
+                series.setName("Top 5");
+                List<Statistics.HubWithAdjacents> top5 = stats.getTop5Hubs();
+                Collections.reverse(top5);
+                for(Statistics.HubWithAdjacents hubWithAdjacents: top5) {
+                    series.getData().add(new XYChart.Data<>(hubWithAdjacents.getAmountOfAdjacentHubs(), hubWithAdjacents.getHub().getName()));
+                }
+                chart.getData().add(series);
+
+                VBox vBox = new VBox();
+                vBox.getChildren().addAll(chart);
+                vBox.setAlignment(Pos.CENTER);
+                Scene newScene = new Scene(vBox, 600, 500);
+                Stage newWindow = new Stage();
+                newWindow.setTitle("Statistics");
+                newWindow.setScene(newScene);
+                newWindow.show();
+            }
+        });
         MenuItem subNetworksItem = new MenuItem("Number of Logistic Sub-Networks");
+        subNetworksItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Label amountOfSubnetworksLabel = new Label("Amount of Logistical Subnetworks: " + stats.amountOfLogisticalSubnetworks());
+                showInformation(amountOfSubnetworksLabel);
+            }
+        });
         calculateMenu.getItems().addAll(amountOfHubsItem, amountOfRoutesItem, hubCentralityItem, top5HubsItem, subNetworksItem);
 
         menuBar.getMenus().addAll(
@@ -99,7 +185,7 @@ public class MainPane extends BorderPane {
 
     private void initGraph() {
         String prefix = "dataset/sgb32/";
-        Graph<Hub, Route> g = FileManager.graphFromFiles(
+        g = FileManager.graphFromFiles(
                 prefix + "name.txt",
                 prefix + "weight.txt",
                 prefix + "xy.txt",
@@ -165,5 +251,18 @@ public class MainPane extends BorderPane {
         g.insertEdge("A", "A", "Loop");
 
         return g;
+    }
+
+    public void showInformation(Label label) {
+        StackPane secondaryLayout = new StackPane();
+        secondaryLayout.getChildren().add(label);
+
+        Scene newScene = new Scene(secondaryLayout, 330, 100);
+
+        // New window (Stage)
+        Stage newWindow = new Stage();
+        newWindow.setTitle("Statistics");
+        newWindow.setScene(newScene);
+        newWindow.show();
     }
 }

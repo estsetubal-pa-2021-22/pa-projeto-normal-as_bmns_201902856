@@ -5,11 +5,7 @@
  */
 package pt.pa.graph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of a digraph that adheres to the {@link Digraph} interface.
@@ -264,7 +260,40 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         }
         return sb.toString();
     }
-    
+
+    @Override
+    public List<Vertex<V>> depthFirstSearch(Vertex<V> start) {
+        List<Vertex<V>> allTraversedVertices = new ArrayList<>();
+        Stack<Vertex<V>> stack = new Stack<>();
+
+        stack.push(start);
+        allTraversedVertices.add(start);
+
+        while(!stack.isEmpty()) {
+            Vertex<V> v = stack.pop();
+
+            for(Vertex<V> adjacent: getAdjacentVertices(v)) {
+                if(!allTraversedVertices.contains(adjacent)) {
+                    allTraversedVertices.add(adjacent);
+                    stack.push(adjacent);
+                }
+            }
+        }
+
+        return allTraversedVertices;
+    }
+
+    @Override
+    public List<Vertex<V>> getAdjacentVertices(Vertex<V> v) {
+        List<Vertex<V>> adjacent = new ArrayList<>();
+
+        for(Edge<E, V> e: outboundEdges(v)) {
+            adjacent.add(opposite(v, e));
+        }
+
+        return adjacent;
+    }
+
     private class MyVertex implements Vertex<V> {
 
         V element;

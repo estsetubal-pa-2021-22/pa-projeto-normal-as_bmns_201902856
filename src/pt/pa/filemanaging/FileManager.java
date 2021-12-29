@@ -2,6 +2,7 @@ package pt.pa.filemanaging;
 
 import pt.pa.graph.Graph;
 import pt.pa.graph.GraphAdjacencyList;
+import pt.pa.graph.GraphEdgeList;
 import pt.pa.model.Hub;
 import pt.pa.model.Matrix;
 import pt.pa.model.MatrixHashMap;
@@ -18,13 +19,13 @@ public class FileManager {
 
     // TODO: Generate graph procedurally and not store the Matrix in memory (risk of OutOfMemoryError). Read by line!
     // TODO: For each city from 0 to n - 1, check routes to the previously read hubs.
-    public static GraphAdjacencyList<Hub, Route> graphFromFiles(
+    public static Graph<Hub, Route> graphFromFiles(
             String nameFile, String weightFile, String xyFile, String routesFile
     ){
         Matrix<Integer> distances = distanceMatrixFromFile(routesFile);
 
         List<Hub> indexOfCities = new ArrayList<>();
-        GraphAdjacencyList<Hub, Route> myGraph = new GraphAdjacencyList<>();
+        Graph<Hub, Route> myGraph = new GraphAdjacencyList<>();
 
         BufferedReader names = readFrom(nameFile);
         BufferedReader weights = readFrom(weightFile);
