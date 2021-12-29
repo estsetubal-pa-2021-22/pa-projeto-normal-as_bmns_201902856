@@ -22,27 +22,28 @@ public class CommandAdd extends Command{
         Vertex<Hub> for1 = null;
         Vertex<Hub> for2 = null;
         for (Vertex<Hub> v :pane.g.vertices()) {
-<<<<<<< Updated upstream
-            if (v.element().getName().toLowerCase(Locale.ROOT) == hub1){
-                for1 = v;
-            }
-            if (v.element().getName().toLowerCase(Locale.ROOT) == hub2){
-=======
             if (v.element().getName().toLowerCase().equals(hub1)){
                 for1 = v;
             }
             if (v.element().getName().toLowerCase().equals(hub2)){
->>>>>>> Stashed changes
                 for2 = v;
             }
         }
         if (for1 != null && for2 != null){
             if (!pane.g.areAdjacent(for1, for2)){
-                backup();
-                pane.g.insertEdge(for1, for2, new Route(for1.element(), for2.element()));
+                Edge<Route, Hub> e = pane.g.insertEdge(for1, for2, new Route(for1.element(), for2.element()));
+                backup(e);
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public void undo() {
+        if(backup != null) {
+            pane.g.removeEdge(backup);
+            pane.graphView.updateAndWait();
+        }
     }
 }

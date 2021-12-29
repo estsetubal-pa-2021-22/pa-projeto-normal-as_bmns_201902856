@@ -265,8 +265,10 @@ public class MainPane extends BorderPane{
             @Override
             public void handle(ActionEvent event) {
                 //execute add Command
+                System.out.println("BEFORE ADDING EDGE: " + g.numEdges());
                 executeCommand(new CommandAdd(pane));
                 graphView.updateAndWait();
+                System.out.println("AFTER ADDING EDGE: " + g.numEdges());
                 stage.close();
             }
         });
@@ -299,8 +301,10 @@ public class MainPane extends BorderPane{
             @Override
             public void handle(ActionEvent event) {
                 //execute remove Command
+                System.out.println("BEFORE REMOVING EDGE: " + g.numEdges());
                 executeCommand(new CommandRemove(pane));
                 graphView.updateAndWait();
+                System.out.println("AFTER REMOVING EDGE: " + g.numEdges());
                 stage.close();
             }
         });
