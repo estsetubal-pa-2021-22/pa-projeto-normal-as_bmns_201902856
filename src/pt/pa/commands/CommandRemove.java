@@ -31,7 +31,7 @@ public class CommandRemove extends Command{
         }
         if (for1 != null && for2 != null){
             if (pane.g.areAdjacent(for1, for2)){
-                backup();
+              backup();
                 for (Edge<Route,Hub> e:pane.g.incidentEdges(for1)) {
                     if (pane.g.opposite(for1,e) == for2){
                         finale = e;

@@ -21,6 +21,7 @@ public class CommandAdd extends Command{
         String hub2 = pane.nameHub2.getSelectedText().toLowerCase(Locale.ROOT);
         Vertex<Hub> for1 = null;
         Vertex<Hub> for2 = null;
+
         for (Vertex<Hub> v :pane.g.vertices()) {
             if (v.element().getName().toLowerCase(Locale.ROOT) == hub1){
                 for1 = v;
