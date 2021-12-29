@@ -22,10 +22,17 @@ public class CommandAdd extends Command{
         Vertex<Hub> for1 = null;
         Vertex<Hub> for2 = null;
         for (Vertex<Hub> v :pane.g.vertices()) {
+<<<<<<< Updated upstream
             if (v.element().getName().toLowerCase(Locale.ROOT) == hub1){
                 for1 = v;
             }
             if (v.element().getName().toLowerCase(Locale.ROOT) == hub2){
+=======
+            if (v.element().getName().toLowerCase().equals(hub1)){
+                for1 = v;
+            }
+            if (v.element().getName().toLowerCase().equals(hub2)){
+>>>>>>> Stashed changes
                 for2 = v;
             }
         }
