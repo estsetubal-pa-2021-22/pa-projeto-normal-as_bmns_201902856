@@ -21,10 +21,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import pt.pa.Statistics;
+import pt.pa.commands.Command;
+import pt.pa.commands.CommandAdd;
+import pt.pa.commands.CommandHistory;
+import pt.pa.commands.CommandRemove;
 import pt.pa.filemanaging.FileManager;
 import pt.pa.graph.*;
 import pt.pa.model.Hub;
@@ -38,6 +44,10 @@ public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
 
+    private CommandHistory history = new CommandHistory();
+    private Stage stage = new Stage(StageStyle.DECORATED);  //For add and Remove
+    private ChoiceBox nameHub1;//For add and Remove
+    private ChoiceBox nameHub2;//For add and Remove
     public SmartGraphPanel<Hub, Route> graphView;
     private SmartGraphDemoContainer whereGraphWillBe;
     private MenuBar menuBar;
@@ -51,7 +61,7 @@ public class MainPane extends BorderPane {
 
     private VBox centerBox;
 
-    private Graph<Hub, Route> g;
+    public Graph<Hub, Route> g;
 
     public MainPane() {
         initGraph();
@@ -71,8 +81,54 @@ public class MainPane extends BorderPane {
 
         this.editMenu = new Menu("Edit");
         MenuItem addRouteItem = new MenuItem("Add Route");
+        addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+            }
+        });
+        addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            /**
+             * Invoked when a specific event to add routes
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(ActionEvent event) {
+                //open new window
+                initWindowAdd();
+            }
+        });
         MenuItem removeRouteItem = new MenuItem("Remove Route");
-        editMenu.getItems().addAll(addRouteItem, removeRouteItem);
+        removeRouteItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            /**
+             * Invoked when a specific event to remove routes
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(ActionEvent event) {
+                //open new window
+                initWindowRemove();
+            }
+        });
+        MenuItem undoItem = new MenuItem("Undo");
+        undoItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            /**
+             * Event to undo changes to the routes
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(ActionEvent event) {
+                //open new window
+                undo();
+            }
+        });
+        editMenu.getItems().addAll(addRouteItem, removeRouteItem, undoItem);
 
         Statistics stats = new Statistics(g);
         this.calculateMenu = new Menu("Calculate");
@@ -265,4 +321,107 @@ public class MainPane extends BorderPane {
         newWindow.setScene(newScene);
         newWindow.show();
     }
+
+    private void executeCommand(Command command) {
+        if (command.execute()) {
+            history.push(command);
+        }
+    }
+
+    private void undo() {
+        if (history.isEmpty()) return;
+
+        Command command = history.pop();
+        if (command != null) {
+            command.undo();
+        }
+    }
+
+    private void initWindowAdd(){
+        MainPane pane = this;
+        Label Hub1 = new Label("Nome Hub1:");
+        Hub1.setFont(new Font(15));
+        nameHub1 = new ChoiceBox();
+        nameHub2 = new ChoiceBox();
+        for (Vertex<Hub> v:g.vertices()) {
+            nameHub1.getItems().add(v.element().getName());
+            nameHub2.getItems().add(v.element().getName());
+        }
+        HBox hub1 = new HBox();
+        hub1.getChildren().addAll(Hub1, nameHub1);
+        Hub1.setAlignment(Pos.CENTER_LEFT);
+        Label Hub2 = new Label("Nome Hub2:");
+        Hub2.setFont(new Font(15));
+        HBox hub2 = new HBox();
+        hub2.getChildren().addAll(Hub2, nameHub2);
+        Hub2.setAlignment(Pos.CENTER_LEFT);
+        Button addBtn = new Button("Add");
+        StackPane root=new StackPane();
+        VBox hub = new VBox();
+        hub.getChildren().addAll(hub1,hub2);
+        root.getChildren().addAll(hub,addBtn);
+        addBtn.setAlignment(Pos.BOTTOM_CENTER);
+        Scene scene = new Scene(root, 300, 150);
+        stage.setScene(scene);
+        stage.show();
+        addBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //execute add Command
+                System.out.println("BEFORE ADDING EDGE: " + g.numEdges());
+                executeCommand(new CommandAdd(pane));
+                graphView.updateAndWait();
+                System.out.println("AFTER ADDING EDGE: " + g.numEdges());
+                stage.close();
+            }
+        });
+    }
+
+    private void initWindowRemove(){
+        MainPane pane = this;
+        Label Hub1 = new Label("Nome Hub1:");
+        Hub1.setFont(new Font(15));
+        nameHub1 = new ChoiceBox();
+        nameHub2 = new ChoiceBox();
+        for (Vertex<Hub> v:g.vertices()) {
+            nameHub1.getItems().add(v.element().getName());
+            nameHub2.getItems().add(v.element().getName());
+        }
+        HBox hub1 = new HBox();
+        hub1.getChildren().addAll(Hub1, nameHub1);
+        Hub1.setAlignment(Pos.CENTER_LEFT);
+        Label Hub2 = new Label("Nome Hub2:");
+        Hub2.setFont(new Font(15));
+        HBox hub2 = new HBox();
+        hub2.getChildren().addAll(Hub2, nameHub2);
+        Hub2.setAlignment(Pos.CENTER_LEFT);
+        Button remBtn = new Button("Remove");
+        StackPane root=new StackPane();
+        VBox hub = new VBox();
+        hub.getChildren().addAll(hub1,hub2);
+        root.getChildren().addAll(hub,remBtn);
+        remBtn.setAlignment(Pos.BOTTOM_CENTER);
+        Scene scene = new Scene(root, 300, 150);
+        stage.setScene(scene);
+        stage.show();
+        remBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                //execute remove Command
+                System.out.println("BEFORE REMOVING EDGE: " + g.numEdges());
+                executeCommand(new CommandRemove(pane));
+                graphView.updateAndWait();
+                System.out.println("AFTER REMOVING EDGE: " + g.numEdges());
+                stage.close();
+            }
+        });
+    }
+
+    public ChoiceBox getNameHub1() {
+        return nameHub1;
+    }
+    public ChoiceBox getNameHub2() {
+        return nameHub2;
+    }
 }
+
