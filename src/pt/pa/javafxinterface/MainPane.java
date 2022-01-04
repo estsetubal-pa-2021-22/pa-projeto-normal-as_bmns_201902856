@@ -38,8 +38,8 @@ public class MainPane extends BorderPane{
     private final int GRAPH_HEIGHT = 768 - 150;
     public Graph<Hub, Route> g; //For Command
     private Stage stage = new Stage(StageStyle.DECORATED);  //For add and Remove
-    public TextField nameHub1;//For add and Remove
-    public TextField nameHub2;//For add and Remove
+    private ChoiceBox nameHub1;//For add and Remove
+    private ChoiceBox nameHub2;//For add and Remove
     public SmartGraphPanel<Hub, Route> graphView;
     private SmartGraphDemoContainer whereGraphWillBe;
     private MenuBar menuBar;
@@ -242,13 +242,17 @@ public class MainPane extends BorderPane{
         MainPane pane = this;
         Label Hub1 = new Label("Nome Hub1:");
         Hub1.setFont(new Font(15));
-        nameHub1 = new TextField("nome hub");
+        nameHub1 = new ChoiceBox();
+        nameHub2 = new ChoiceBox();
+        for (Vertex<Hub> v:g.vertices()) {
+            nameHub1.getItems().add(v.element().getName());
+            nameHub2.getItems().add(v.element().getName());
+        }
         HBox hub1 = new HBox();
         hub1.getChildren().addAll(Hub1, nameHub1);
         Hub1.setAlignment(Pos.CENTER_LEFT);
         Label Hub2 = new Label("Nome Hub2:");
         Hub2.setFont(new Font(15));
-        nameHub2 = new TextField("nome hub");
         HBox hub2 = new HBox();
         hub2.getChildren().addAll(Hub2, nameHub2);
         Hub2.setAlignment(Pos.CENTER_LEFT);
@@ -278,13 +282,17 @@ public class MainPane extends BorderPane{
         MainPane pane = this;
         Label Hub1 = new Label("Nome Hub1:");
         Hub1.setFont(new Font(15));
-        nameHub1 = new TextField("nome hub");
+        nameHub1 = new ChoiceBox();
+        nameHub2 = new ChoiceBox();
+        for (Vertex<Hub> v:g.vertices()) {
+            nameHub1.getItems().add(v.element().getName());
+            nameHub2.getItems().add(v.element().getName());
+        }
         HBox hub1 = new HBox();
         hub1.getChildren().addAll(Hub1, nameHub1);
         Hub1.setAlignment(Pos.CENTER_LEFT);
         Label Hub2 = new Label("Nome Hub2:");
         Hub2.setFont(new Font(15));
-        nameHub2 = new TextField("nome hub");
         HBox hub2 = new HBox();
         hub2.getChildren().addAll(Hub2, nameHub2);
         Hub2.setAlignment(Pos.CENTER_LEFT);
@@ -308,5 +316,12 @@ public class MainPane extends BorderPane{
                 stage.close();
             }
         });
+    }
+
+    public ChoiceBox getNameHub1() {
+        return nameHub1;
+    }
+    public ChoiceBox getNameHub2() {
+        return nameHub2;
     }
 }
