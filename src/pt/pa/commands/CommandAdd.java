@@ -17,15 +17,15 @@ public class CommandAdd extends Command{
 
     @Override
     public boolean execute() {
-        String hub1 = pane.nameHub1.getText().toLowerCase();
-        String hub2 = pane.nameHub2.getText().toLowerCase();
+        String hub1 = (String) pane.getNameHub1().getValue();
+        String hub2 = (String) pane.getNameHub2().getValue();
         Vertex<Hub> for1 = null;
         Vertex<Hub> for2 = null;
         for (Vertex<Hub> v :pane.g.vertices()) {
-            if (v.element().getName().toLowerCase().equals(hub1)){
+            if (v.element().getName().toLowerCase().equals(hub1.toLowerCase())){
                 for1 = v;
             }
-            if (v.element().getName().toLowerCase().equals(hub2)){
+            if (v.element().getName().toLowerCase().equals(hub2.toLowerCase())){
                 for2 = v;
             }
         }
@@ -42,8 +42,20 @@ public class CommandAdd extends Command{
     @Override
     public void undo() {
         if(backup != null) {
-            pane.g.removeEdge(backup);
+            Edge<Route, Hub> aux = null;
+            /*
+             *check for because of case add - remove - undo - undo
+             */
+            for (Edge<Route, Hub> e:pane.g.edges()) {
+                if (e.element().getFirstHub().equals(backup.element().getFirstHub()) && e.element().getSecondHub().equals(backup.element().getSecondHub())){
+                    aux = e;
+                }
+
+            }
+            if (aux!=null){
+            pane.g.removeEdge(aux);
             pane.graphView.updateAndWait();
+            }
         }
     }
 }

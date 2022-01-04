@@ -252,7 +252,6 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         if (!edges().contains(edge)) {
             throw new InvalidEdgeException("Edge does not belong to this graph.");
         }
-
         return edge;
     }
 

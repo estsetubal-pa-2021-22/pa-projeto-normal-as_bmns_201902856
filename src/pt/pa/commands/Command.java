@@ -8,7 +8,7 @@ import pt.pa.model.Route;
 
 public abstract class Command {
     public MainPane pane;
-    protected Edge<Route, Hub> backup; //TODO Ver para algo mais leve
+    protected Edge<Route, Hub> backup;
 
     Command(MainPane pane) {
         this.pane = pane;

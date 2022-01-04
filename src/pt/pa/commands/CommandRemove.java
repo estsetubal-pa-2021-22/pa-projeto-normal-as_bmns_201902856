@@ -16,16 +16,16 @@ public class CommandRemove extends Command{
 
     @Override
     public boolean execute() {
-        String hub1 = pane.nameHub1.getText().toLowerCase();
+        String hub1 = (String) pane.getNameHub1().getValue();
         Vertex<Hub> for1 = null;
         Vertex<Hub> for2 = null;
         Edge<Route,Hub> finale = null;
-        String hub2 = pane.nameHub2.getText().toLowerCase();
+        String hub2 = (String) pane.getNameHub2().getValue();
         for (Vertex<Hub> v :pane.g.vertices()) {
-            if (v.element().getName().toLowerCase().equals(hub1)){
+            if (v.element().getName().toLowerCase().equals(hub1.toLowerCase())){
                 for1 = v;
             }
-            if (v.element().getName().toLowerCase().equals(hub2)){
+            if (v.element().getName().toLowerCase().equals(hub2.toLowerCase())){
                 for2 = v;
             }
         }
