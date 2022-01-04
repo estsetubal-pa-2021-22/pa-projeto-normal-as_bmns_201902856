@@ -9,7 +9,7 @@ public class Logger {
     private static Logger singleton;
     private static final String LOGFILE = "log.txt";
     private BufferedWriter logFile;
-    private enum Type {INFO, WARNING , ERROR};
+    protected enum Type {INFO, WARNING , ERROR};
 
     private Logger(){
         openFile();
