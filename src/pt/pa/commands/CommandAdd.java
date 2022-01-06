@@ -42,8 +42,20 @@ public class CommandAdd extends Command{
     @Override
     public void undo() {
         if(backup != null) {
-            pane.g.removeEdge(backup);
-            pane.graphView.updateAndWait();
+            Edge<Route, Hub> aux = null;
+            /*
+             *check for because of case add - remove - undo - undo
+             */
+            for (Edge<Route, Hub> e:pane.g.edges()) {
+                if (e.element().getFirstHub().equals(backup.element().getFirstHub()) && e.element().getSecondHub().equals(backup.element().getSecondHub())){
+                    aux = e;
+                }
+
+            }
+            if (aux!=null){
+                pane.g.removeEdge(aux);
+                pane.graphView.updateAndWait();
+            }
         }
     }
 }
