@@ -51,4 +51,16 @@ public class Route {
         sb.append('}');
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj==null) return false;
+
+        if(this.getClass()!=obj.getClass()) return false;
+
+        if(this.firstHub.equals(((Route) obj).getFirstHub()) && this.secondHub.equals(((Route) obj).getSecondHub())){
+            return true;
+        }
+        return false;
+    }
 }

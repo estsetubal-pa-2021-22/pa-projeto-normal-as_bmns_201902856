@@ -1,6 +1,6 @@
 package pt.pa.model;
 
-public class Hub {
+public class Hub implements Comparable<Hub>{
     private String name;
     private int population;
     private int guiX, guiY;
@@ -78,5 +78,10 @@ public class Hub {
             return sb.toString();
         }
         return name;
+    }
+
+    @Override
+    public int compareTo(Hub obj) {
+        return this.name.compareToIgnoreCase(obj.getName());
     }
 }

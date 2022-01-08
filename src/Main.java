@@ -5,8 +5,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pt.pa.graph.Edge;
 import pt.pa.graph.Graph;
 import pt.pa.graph.GraphAdjacencyList;
+import pt.pa.graph.Vertex;
 import pt.pa.javafxinterface.MainPane;
 import pt.pa.model.Hub;
 import pt.pa.model.Matrix;
@@ -16,6 +18,8 @@ import pt.pa.filemanaging.FileManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends Application {
 
@@ -35,9 +39,11 @@ public class Main extends Application {
         );
         System.out.println(testGraph);
 
+
         Rectangle2D rect = Screen.getPrimary().getBounds();
         //Rectangle2D rect = new Rectangle2D(900, 900, 900, 900);
         double scale = 0.9;
+
 
         MainPane mainPane = new MainPane();
 
@@ -51,7 +57,6 @@ public class Main extends Application {
         stage.show();
 
         mainPane.graphView.init();
-
     }
 
 

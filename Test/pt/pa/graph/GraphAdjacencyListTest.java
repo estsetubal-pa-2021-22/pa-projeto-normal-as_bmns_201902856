@@ -80,7 +80,6 @@ class GraphAdjacencyListTest {
     @org.junit.jupiter.api.Test
     void edges() {
         List<Edge<Route, Hub>> edgeList = new ArrayList<>(distances.edges());
-
         assertTrue(edgeList.contains(e1) && edgeList.contains(e2) && edgeList.contains(e3) && edgeList.contains(e4)
                 && edgeList.contains(e5) && edgeList.contains(e6) && edgeList.contains(e7) && edgeList.contains(e8));
     }

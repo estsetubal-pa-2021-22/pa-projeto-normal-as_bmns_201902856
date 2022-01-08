@@ -75,6 +75,19 @@ public class MainPane extends BorderPane {
         this.fileMenu = new Menu("File");
         MenuItem importFileItem = new MenuItem("Import File");
         MenuItem exportFileItem = new MenuItem("Export File");
+        exportFileItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            /**
+             * Invoked when a specific event to remove routes
+             *
+             * @param event the event which occurred
+             */
+            @Override
+            public void handle(ActionEvent event) {
+                //open new window
+                selectDirectoryToExport(g);
+            }
+        });
         MenuItem quitItem = new MenuItem("Quit");
         quitItem.setOnAction(e -> System.exit(0));
         fileMenu.getItems().addAll(importFileItem, exportFileItem, quitItem);
@@ -347,6 +360,9 @@ public class MainPane extends BorderPane {
             nameHub1.getItems().add(v.element().getName());
             nameHub2.getItems().add(v.element().getName());
         }
+        Collections.sort(nameHub1.getItems());
+        Collections.sort(nameHub2.getItems());
+
         HBox hub1 = new HBox();
         hub1.getChildren().addAll(Hub1, nameHub1);
         Hub1.setAlignment(Pos.CENTER_LEFT);
@@ -387,6 +403,9 @@ public class MainPane extends BorderPane {
             nameHub1.getItems().add(v.element().getName());
             nameHub2.getItems().add(v.element().getName());
         }
+        Collections.sort(nameHub1.getItems());
+        Collections.sort(nameHub2.getItems());
+
         HBox hub1 = new HBox();
         hub1.getChildren().addAll(Hub1, nameHub1);
         Hub1.setAlignment(Pos.CENTER_LEFT);
@@ -422,6 +441,15 @@ public class MainPane extends BorderPane {
     }
     public ChoiceBox getNameHub2() {
         return nameHub2;
+    }
+
+    public void selectDirectoryToExport(Graph<Hub, Route> graph){
+        if(graph.vertices().size()<=32){
+          FileManager.graphToFile(g,"dataset/sgb32/routes.txt");
+        }else{
+          FileManager.graphToFile(g,"dataset/sgb128/routes.txt");
+        }
+
     }
 }
 

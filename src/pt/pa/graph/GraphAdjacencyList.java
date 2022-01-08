@@ -274,6 +274,7 @@ public class GraphAdjacencyList<V,E> implements Graph<V, E> {
         return vertex;
     }
 
+
     private MyEdge checkEdge(Edge<E, V> e) throws InvalidEdgeException {
         if(e == null) throw new InvalidEdgeException("Null edge.");
 

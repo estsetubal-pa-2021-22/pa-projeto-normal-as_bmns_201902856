@@ -1,17 +1,12 @@
 package pt.pa.filemanaging;
 
-import pt.pa.graph.Graph;
-import pt.pa.graph.GraphAdjacencyList;
-import pt.pa.graph.GraphEdgeList;
+import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Matrix;
 import pt.pa.model.MatrixHashMap;
 import pt.pa.model.Route;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,4 +130,48 @@ public class FileManager {
             return null;
         }
     }
+
+    public static void graphToFile( Graph<Hub,Route> graph, String routesFile) {
+        PrintWriter pw = writeTo(routesFile);
+
+        List<Vertex<Hub>> vertexList = new ArrayList<>(graph.vertices());
+
+        for(Vertex<Hub> vertex:vertexList){
+            List<Edge<Route,Hub>> edgeList = new ArrayList<>(graph.incidentEdges(vertex));
+
+            int[] distances = new int[vertexList.size()];
+            for(Edge<Route,Hub> incidentEdge:edgeList){
+                    Vertex<Hub> oppositeVertex = graph.opposite(vertex, incidentEdge);
+                    int indexOppsite = vertexList.indexOf(oppositeVertex);
+                    distances[indexOppsite] = (int)incidentEdge.element().getDistance();
+            }
+
+            StringBuilder builder = new StringBuilder();
+            for (int j=0;j<distances.length;j++){
+                builder.append(String.format(" %d",distances[j]));
+            }
+            pw.println(builder.substring(1));
+
+        }
+
+        pw.flush();
+        pw.close();
+    }
+
+
+
+        public static PrintWriter writeTo(String filename){
+        File ficheiro = new File(System.getProperty("user.dir") + File.separator + filename);
+        System.out.println(System.getProperty("user.dir") + File.separator + filename);
+        try {
+            FileWriter fileWriter = new FileWriter(ficheiro);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            return new PrintWriter(bufferedWriter);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
 }
