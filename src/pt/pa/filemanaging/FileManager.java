@@ -1,18 +1,16 @@
 package pt.pa.filemanaging;
 
-import pt.pa.graph.Graph;
-import pt.pa.graph.GraphAdjacencyList;
-import pt.pa.graph.GraphEdgeList;
+import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Matrix;
 import pt.pa.model.MatrixHashMap;
 import pt.pa.model.Route;
+import pt.pa.shortcuts.StringFromIterable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class FileManager {
@@ -69,6 +67,34 @@ public class FileManager {
 
         return myGraph;
     }
+
+public static void routesToFile(Graph<Hub, Route> g, String filename) {
+    PrintWriter pw = printTo(filename);
+
+    if (pw != null) {
+        List<Vertex<Hub>> vertices = new ArrayList<>(g.vertices());
+
+        for (Vertex<Hub> v: vertices) {
+            Integer[] dist = new Integer[8];
+            Arrays.fill(dist, 0);
+            //for (int i = 0; i < vertices.size(); i++) dist.add(0);
+
+            ArrayList<Edge<Route, Hub>> incident = new ArrayList<>(g.incidentEdges(v));
+
+            for(Edge<Route, Hub> e: g.incidentEdges(v)) {
+                //                   Se v é o índice 0 ?          O oposto é o 1    O oposto é o 0
+                Vertex<Hub> other = (e.vertices()[0].equals(v)) ? e.vertices()[1] : e.vertices()[0];
+                //dist.set(vertices.indexOf(other), (int)(e.element().getDistance()));
+                dist[vertices.indexOf(other)] = (int)(e.element().getDistance());
+            }
+
+            pw.println((new StringFromIterable<Integer>()).delimit(" ", Arrays.asList(dist)));
+        }
+
+        pw.flush();
+        pw.close();
+    }
+}
 
     public static Matrix<Integer> distanceMatrixFromFile(String filename) {
         BufferedReader br = readFrom(filename);
@@ -129,6 +155,18 @@ public class FileManager {
             FileReader fileReader = new FileReader(ficheiro);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             return bufferedReader;
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public static PrintWriter printTo(String filename) {
+        File ficheiro = new File(System.getProperty("user.dir") + File.separator + filename);
+        System.out.println(System.getProperty("user.dir") + File.separator + filename);
+        try {
+            return new PrintWriter(new BufferedWriter(new FileWriter(ficheiro)));
         }
         catch (IOException e) {
             System.out.println(e.getMessage());

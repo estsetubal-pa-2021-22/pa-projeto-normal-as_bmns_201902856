@@ -4,6 +4,7 @@ import pt.pa.graph.Graph;
 import pt.pa.graph.Vertex;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
+import pt.pa.shortcuts.StringFromIterable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,23 +16,38 @@ import java.util.stream.Stream;
 public class Statistics {
     private Graph<Hub, Route> graph;
 
+    private boolean willLog;
+
     /**
      * @param graph Graph you want to get the statistics from.
      */
     public Statistics(Graph graph) {
         this.graph = graph;
+        this.willLog = true;
     }
 
     public int getAmountOfHubs() {
-        return graph.numVertices();
+        int hubs = graph.numVertices();
+        if (willLog) {
+            Logger.getInstance().logInfo(this,
+                    String.format("Hub Count: %d", hubs)
+            );
+        }
+        return hubs;
     }
 
     public int getAmountOfRoutes() {
-        return graph.numEdges();
+        int routes = graph.numEdges();
+        if (willLog) {
+            Logger.getInstance().logInfo(this,
+                    String.format("Route Count: %d", routes)
+            );
+        }
+        return routes;
     }
 
     /**
-     * Determines the amount of adjacent hubs of each hub, i.e., how centralized are the hubs.
+     * Determines the amount of adjacent hubs of each hub, i.e., how centralized the hubs are.
      *
      * @return An ordered list with tuples containing the hub and the respective amount of adjacent hubs.
      */
@@ -45,6 +61,16 @@ public class Statistics {
         }
 
         Collections.sort(allHubsWithAdjacents);
+
+        if (willLog) {
+            Logger.getInstance().logInfo(this,
+                    String.format("Hub Centrality:\n\t%s",
+                            (new StringFromIterable<HubWithAdjacents>()).delimit("\n\t", allHubsWithAdjacents)
+                    )
+            );
+        }
+
+
         return allHubsWithAdjacents;
     }
 
@@ -52,6 +78,17 @@ public class Statistics {
      * @return The top 5 hubs with the most adjacent hubs.
      */
     public List<HubWithAdjacents> getTop5Hubs() {
+        this.willLog = false;
+        List<HubWithAdjacents> top5List = getHubCentrality().stream().limit(5).collect(Collectors.toList());
+        this.willLog = true;
+
+        Logger.getInstance().logInfo(this,
+                String.format("Top 5 with Most Connections:\n %s",
+                        (new StringFromIterable<HubWithAdjacents>()).delimit("\n ", top5List)
+                )
+        );
+
+
         return getHubCentrality().stream().limit(5).collect(Collectors.toList());
     }
 
@@ -76,6 +113,14 @@ public class Statistics {
             allTraversedVertices.addAll(traversedVertices);
             amountOfSubnetworks++;
         }
+
+        if (willLog) {
+            Logger.getInstance().logInfo(this,
+                    String.format("Amount of Subnetworks: %d", amountOfSubnetworks
+                    )
+            );
+        }
+
         return amountOfSubnetworks;
     }
 
@@ -108,7 +153,7 @@ public class Statistics {
 
         @Override
         public String toString() {
-            return hub.getName() + " ---> " + amountOfAdjacentHubs + " adjacent hubs\n";
+            return hub.getName() + " ---> " + amountOfAdjacentHubs + " adjacent hubs";
         }
     }
 }

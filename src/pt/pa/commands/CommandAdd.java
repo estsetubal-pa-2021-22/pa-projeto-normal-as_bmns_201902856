@@ -1,6 +1,7 @@
 package pt.pa.commands;
 
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
+import pt.pa.Logger;
 import pt.pa.graph.Edge;
 import pt.pa.graph.Vertex;
 import pt.pa.javafxinterface.MainPane;
@@ -33,9 +34,22 @@ public class CommandAdd extends Command{
             if (!pane.g.areAdjacent(for1, for2)){
                 Edge<Route, Hub> e = pane.g.insertEdge(for1, for2, new Route(for1.element(), for2.element()));
                 backup(e);
+                Logger.getInstance().logInfo(pane,
+                        String.format("Added route:\n  from %s\n  to %s\n(Distance = %.2f)",
+                            for1.element().getName(),
+                            for2.element().getName(),
+                            e.element().getDistance()
+                        )
+                );
                 return true;
             }
         }
+        Logger.getInstance().logError(pane,
+                String.format("A route already exists\n  from %s\n  to %s!",
+                        for1.element().getName(),
+                        for2.element().getName()
+                )
+        );
         return false;
     }
 
@@ -53,6 +67,13 @@ public class CommandAdd extends Command{
 
             }
             if (aux!=null){
+                Logger.getInstance().logInfo(pane,
+                        String.format("Undo of added route:\n  from %s\n  to %s\n(Distance = %.2f)",
+                                aux.element().getFirstHub().getName(),
+                                aux.element().getSecondHub().getName(),
+                                aux.element().getDistance()
+                        )
+                );
                 pane.g.removeEdge(aux);
                 pane.graphView.updateAndWait();
             }

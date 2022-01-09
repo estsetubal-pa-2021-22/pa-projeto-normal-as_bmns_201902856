@@ -26,6 +26,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pt.pa.Logger;
 import pt.pa.Statistics;
 import pt.pa.commands.Command;
 import pt.pa.commands.CommandAdd;
@@ -44,6 +45,9 @@ public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
 
+    private final int LOG_HEIGHT = GRAPH_HEIGHT;
+    private final int LOG_WIDTH = (int)(0.5 * GRAPH_WIDTH);
+
     private CommandHistory history = new CommandHistory();
     private Stage stage = new Stage(StageStyle.DECORATED);  //For add and Remove
     private ChoiceBox nameHub1;//For add and Remove
@@ -57,7 +61,7 @@ public class MainPane extends BorderPane {
 
     private VBox logBox;
     private Label logTitle;
-    private TextArea logArea;
+    private ListView<Label> logArea;
 
     private VBox centerBox;
 
@@ -75,18 +79,21 @@ public class MainPane extends BorderPane {
         this.fileMenu = new Menu("File");
         MenuItem importFileItem = new MenuItem("Import File");
         MenuItem exportFileItem = new MenuItem("Export File");
+        MenuItem clearLogItem = new MenuItem("Clear Log File");
         MenuItem quitItem = new MenuItem("Quit");
+
+        clearLogItem.setOnAction(e -> Logger.getInstance().clear());
         quitItem.setOnAction(e -> System.exit(0));
-        fileMenu.getItems().addAll(importFileItem, exportFileItem, quitItem);
+        fileMenu.getItems().addAll(importFileItem, exportFileItem, clearLogItem, quitItem);
 
         this.editMenu = new Menu("Edit");
         MenuItem addRouteItem = new MenuItem("Add Route");
-        addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
+        /*addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
 
             }
-        });
+        });*/
         addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
 
             /**
@@ -225,18 +232,20 @@ public class MainPane extends BorderPane {
         logTitle.setAlignment(Pos.CENTER);
         logTitle.setTextAlignment(TextAlignment.CENTER);
 
-        this.logArea = new TextArea();
-        logArea.setPrefRowCount(36);
+        this.logArea = new ListView<>();
+        logArea.setMinHeight(LOG_HEIGHT);
+        logArea.setMaxHeight(LOG_HEIGHT);
+        logArea.setMinWidth(LOG_WIDTH);
+        logArea.setMinWidth(LOG_WIDTH);
         logArea.setEditable(false);
 
         this.logBox = new VBox(5, logTitle, logArea);
-        this.logBox.setMaxWidth(300);
+        this.logBox.setMaxWidth(LOG_WIDTH);
 
         this.setRight(logBox);
         BorderPane.setMargin(logBox, new Insets(0, 20, 0, 0));
 
-        JavaFxAux.initLog(logArea, true);
-
+        Logger.getInstance().setLoggerView(logArea);
     }
 
     private void initGraph() {
