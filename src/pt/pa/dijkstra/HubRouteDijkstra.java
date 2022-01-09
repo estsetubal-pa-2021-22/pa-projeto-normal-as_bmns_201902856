@@ -1,0 +1,167 @@
+package pt.pa.dijkstra;
+
+import javafx.util.Pair;
+import pt.pa.graph.Edge;
+import pt.pa.graph.GraphAdjacencyList;
+import pt.pa.graph.Vertex;
+import pt.pa.model.Hub;
+import pt.pa.model.Route;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class HubRouteDijkstra {
+    private static HubRouteDijkstra instance;
+
+    private static GraphAdjacencyList<Hub, Route> graph;
+
+    private HubRouteDijkstra() {}
+
+    public static HubRouteDijkstra getInstance() {
+        if (instance == null) {
+            instance = new HubRouteDijkstra();
+        }
+        return instance;
+    }
+
+    public void setGraph(GraphAdjacencyList<Hub, Route> graph) {
+        this.graph = graph;
+    }
+
+    public HubRouteDijkstraResult dijkstra(Vertex<Hub> origin, boolean unit) {
+        HubRouteDijkstraResult output = new HubRouteDijkstraResult();
+        Set<Vertex<Hub>> allVertices = new HashSet<>(graph.vertices());
+
+        for (Vertex<Hub> v: allVertices) {
+            output.setCost(v, Integer.MAX_VALUE);
+            output.setPredecessor(v, null);
+        }
+
+        output.setCost(origin, 0);
+
+        while (!allVertices.isEmpty()) {
+            Vertex<Hub> lowest = findLowest(allVertices, output);
+            if (output.getCost(lowest) == Integer.MAX_VALUE) return null;
+
+            allVertices.remove(lowest);
+
+            for (Vertex<Hub> v: graph.getAdjacentVertices(lowest)) {
+                int cost = output.getCost(lowest) + getDistanceBetween(v, lowest, unit);
+                if (cost < output.getCost(v)) {
+                    output.setCost(v, cost);
+                    output.setPredecessor(v, lowest);
+                }
+            }
+        }
+
+        return output;
+    }
+
+    public HubRouteDijkstraResult dijkstra(Vertex<Hub> origin) {
+        return dijkstra(origin, false);
+    }
+
+    public HubRouteDijkstraResult unitDijkstra(Vertex<Hub> origin) {
+        return dijkstra(origin, true);
+    }
+
+    public List<Vertex<Hub>> shortestPath(Vertex<Hub> hub1, Vertex<Hub> hub2) {
+
+        return shortestPath(hub1, hub2, new AtomicInteger(0));
+    }
+
+    public List<Vertex<Hub>> shortestPath(Vertex<Hub> hub1, Vertex<Hub> hub2, AtomicInteger distance) {
+        HubRouteDijkstraResult dijkstra = dijkstra(hub1);
+        Vertex<Hub> goal = hub2;
+
+        distance.set(dijkstra.getCost(hub2));
+
+        List<Vertex<Hub>> path = new ArrayList<>();
+        path.add(goal);
+
+        if (hub1.equals(hub2)) return path;
+
+        while (!goal.equals(hub1)) {
+            goal = dijkstra.getPredecessor(goal);
+            path.add(0, goal);
+        }
+
+        path.add(0, hub1);
+
+        return path;
+    }
+
+    public List<Vertex<Hub>> shortestPath(HubRouteDijkstraResult dijkstra, Vertex<Hub> hub2) {
+
+        return shortestPath(dijkstra, hub2, new AtomicInteger(0));
+    }
+
+    public List<Vertex<Hub>> shortestPath(HubRouteDijkstraResult dijkstra, Vertex<Hub> hub2, AtomicInteger distance) {
+
+        Vertex<Hub> goal = hub2;
+
+        distance.set(dijkstra.getCost(hub2));
+
+        List<Vertex<Hub>> path = new ArrayList<>();
+        path.add(goal);
+
+        if (goal.equals(hub2)) return path;
+
+        while (!(dijkstra.getPredecessor(goal) == null)) {
+            goal = dijkstra.getPredecessor(goal);
+            path.add(0, goal);
+        }
+
+        path.add(0, goal);
+
+        return path;
+    }
+    
+    public Pair<Hub, Hub> farthestHubPair() {
+        Pair<Hub, Hub> pair = new Pair<>(null, null);
+
+        List<Vertex<Hub>> vertices = new ArrayList<>(graph.vertices());
+        int distance = 0;
+
+        for (Vertex<Hub> v: vertices) {
+            HubRouteDijkstraResult dijkstra = dijkstra(v);
+            Vertex<Hub> farthest = dijkstra.farthestHub();
+            int currentDistance = dijkstra.getCost(farthest);
+
+            if (currentDistance > distance) {
+                pair = new Pair<>(v.element(), farthest.element());
+                distance = currentDistance;
+            }
+
+        }
+
+        return pair;
+    }
+
+    private Vertex<Hub> findLowest(Set<Vertex<Hub>> vSet, HubRouteDijkstraResult hrdr) {
+        int cost = Integer.MAX_VALUE;
+        Vertex<Hub> lowest = null;
+
+        for (Vertex<Hub> v: vSet) {
+            if (hrdr.getCost(v) < cost) {
+                cost = hrdr.getCost(v);
+                lowest = v;
+            }
+        }
+
+        return lowest;
+    }
+
+    private int getDistanceBetween(Vertex<Hub> hub1, Vertex<Hub> hub2, boolean unit) {
+        for (Edge<Route, Hub> e: graph.incidentEdges(hub1)) {
+            if (graph.opposite(hub1, e).equals(hub2)) {
+                return unit ? 1 : (int)(e.element().getDistance());
+            }
+        }
+        return -1;
+    }
+}
+
