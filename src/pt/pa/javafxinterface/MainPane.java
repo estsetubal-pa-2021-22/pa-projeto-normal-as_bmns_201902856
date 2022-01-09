@@ -301,12 +301,15 @@ public class MainPane extends BorderPane {
                         rootVertex = v;
                     }
                 }
+                //System.out.println("Root Vertex: " + rootVertex);
                 HubRouteGraphSearch graphSearch = new HubRouteGraphSearch((GraphAdjacencyList<Hub, Route>) g);
                 List<Vertex<Hub>> verticesInRange = graphSearch.bfsLimited(rootVertex, intSpinner.getValue());
                 verticesInRange.stream().map(value -> value.element().getName()).forEach(System.out::println);
                 for(Vertex<Hub> v: verticesInRange) {
                     graphView.getStylableVertex(v).setStyleClass("selectedVertex");
                     List<Vertex<Hub>> shortestPath = hubRouteDijkstra.shortestPath(rootVertex, v);
+                    //shortestPath.forEach(e -> System.out.println("Path: " + e));
+
                     for(Edge<Route, Hub> e: hubRouteDijkstra.edgesUpTo(shortestPath)) {
                         graphView.getStylableEdge(e).setStyleClass("selectedEdge");
                     }
@@ -359,7 +362,7 @@ public class MainPane extends BorderPane {
                 prefix + "routes_1.txt"
         );
         //Graph<String, String> g = build_flower_graph();
-        System.out.println(g);
+        //System.out.println(g);
 
         SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
         //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();

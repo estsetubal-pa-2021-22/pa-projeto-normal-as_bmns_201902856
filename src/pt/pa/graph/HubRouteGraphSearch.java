@@ -25,6 +25,8 @@ public class HubRouteGraphSearch {
         HubRouteDijkstra.getInstance().setGraph(graph);
         HubRouteDijkstraResult dijkstra = HubRouteDijkstra.getInstance().unitDijkstra(root);
 
+        //System.out.println(dijkstra);
+
         List<Vertex<Hub>> returnList = new ArrayList<>();
 
         Queue<Vertex<Hub>> queue = new LinkedList<>();
@@ -38,7 +40,7 @@ public class HubRouteGraphSearch {
             Vertex<Hub> vertex = queue.poll();
 
             int routeDistance = HubRouteDijkstra.getInstance().shortestPath(dijkstra, vertex).size() - 1;
-            System.out.printf("Vertex1 : %s ---- Root: %s :::::::: Distance: %d\n", vertex.element().getName(), root.element().getName(), routeDistance);
+            //System.out.printf("Vertex1 : %s ---- Root: %s :::::::: Distance: %d\n", vertex.element().getName(), root.element().getName(), routeDistance);
 
             if (routeDistance <= limit) {
                 returnList.add(vertex);

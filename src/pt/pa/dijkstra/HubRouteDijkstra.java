@@ -102,14 +102,17 @@ public class HubRouteDijkstra {
 
         Vertex<Hub> goal = hub2;
 
+        //System.out.println("Init Path Vertex: " + hub2.element());
+
         distance.set(dijkstra.getCost(hub2));
 
         List<Vertex<Hub>> path = new ArrayList<>();
         path.add(goal);
 
-        if (goal.equals(hub2)) return path;
+        //if (goal.equals(hub2)) return path;
 
         while (!(dijkstra.getPredecessor(goal) == null)) {
+            //System.out.println("Shortest Path Vertex: " + goal.element());
             goal = dijkstra.getPredecessor(goal);
             path.add(0, goal);
         }

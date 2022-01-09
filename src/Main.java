@@ -34,7 +34,7 @@ public class Main extends Application {
                 prefix + "xy.txt",
                 prefix + "routes_1.txt"
         );
-        System.out.println(testGraph);
+        //System.out.println(testGraph);
 
         Rectangle2D rect = Screen.getPrimary().getBounds();
         //Rectangle2D rect = new Rectangle2D(900, 900, 900, 900);

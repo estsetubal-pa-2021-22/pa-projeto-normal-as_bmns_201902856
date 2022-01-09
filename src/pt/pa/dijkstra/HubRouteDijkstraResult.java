@@ -41,6 +41,19 @@ public class HubRouteDijkstraResult {
     public int getCost(Vertex<Hub> vertex) { return costs.get(vertex); }
     public Vertex<Hub> getPredecessor(Vertex<Hub> vertex) { return predecessors.get(vertex); }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("HubRouteDijkstraResult {\n");
+        sb.append(" ------ costs = \n");
 
+        costs.forEach((k, v) -> sb.append(" . " + ((k != null) ? k.element() : "NA") + ": " + v + "\n"));
+
+        sb.append(",\n ------ predecessors = \n");
+
+        predecessors.forEach((k, v) -> sb.append(" . " + ((k != null) ? k.element() : "NA") + ": " + ((v != null) ? v.element() : "NA") + "\n"));
+
+        sb.append('}');
+        return sb.toString();
+    }
 }
 
