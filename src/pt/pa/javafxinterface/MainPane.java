@@ -4,14 +4,12 @@ import com.brunomnsilva.smartgraph.containers.SmartGraphDemoContainer;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
-import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -19,27 +17,27 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Pair;
 import pt.pa.Logger;
 import pt.pa.Statistics;
 import pt.pa.commands.Command;
 import pt.pa.commands.CommandAdd;
 import pt.pa.commands.CommandHistory;
 import pt.pa.commands.CommandRemove;
+import pt.pa.dijkstra.HubRouteDijkstra;
 import pt.pa.filemanaging.FileManager;
 import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
@@ -57,7 +55,8 @@ public class MainPane extends BorderPane {
     private MenuBar menuBar;
     private Menu fileMenu,
                  editMenu,
-                 calculateMenu;
+                 calculateMenu,
+                 showMenu;
 
     private VBox logBox;
     private Label logTitle;
@@ -220,8 +219,111 @@ public class MainPane extends BorderPane {
         });
         calculateMenu.getItems().addAll(amountOfHubsItem, amountOfRoutesItem, hubCentralityItem, top5HubsItem, subNetworksItem);
 
+        this.showMenu = new Menu("Show");
+        HubRouteDijkstra hubRouteDijkstra = HubRouteDijkstra.getInstance();
+        hubRouteDijkstra.setGraph((GraphAdjacencyList<Hub, Route>) g);
+        MenuItem shortestPathItem = new MenuItem("Shortest path between 2 hubs");
+        shortestPathItem.setOnAction((event -> {
+            VBox doubleChoiceVBox = createVBoxWithDoubleChoiceBox();
+            Button findShortestBtn = new Button("Find shortest path: ");
+            StackPane root=new StackPane();
+            root.getChildren().addAll(doubleChoiceVBox,findShortestBtn);
+            findShortestBtn.setAlignment(Pos.BOTTOM_CENTER);
+            Scene scene = new Scene(root, 400, 200);
+            stage.setScene(scene);
+            stage.show();
+            findShortestBtn.setOnAction((event1 -> {
+
+                Vertex<Hub> v1 = null;
+                Vertex<Hub> v2 = null;
+                String hub1 = ((String) nameHub1.getValue()).toLowerCase();
+                String hub2 = ((String) nameHub2.getValue()).toLowerCase();
+                for(Vertex<Hub> v: g.vertices()) {
+                    if(v.element().getName().toLowerCase().equals(hub1)) {
+                        v1 = v;
+                    }
+                    if(v.element().getName().toLowerCase().equals(hub2)) {
+                        v2 = v;
+                    }
+                }
+                if(!g.depthFirstSearch(v1).contains(v2)) {
+                    return;
+                }
+                stage.close();
+                List<Vertex<Hub>> shortestPathVertices = hubRouteDijkstra.shortestPath(v1, v2);
+                for(Vertex<Hub> v: shortestPathVertices) {
+                    graphView.getStylableVertex(v).setStyleClass("selectedVertex");
+                }
+                for(Edge<Route, Hub> e: hubRouteDijkstra.edgesUpTo(shortestPathVertices)) {
+                    graphView.getStylableEdge(e).setStyleClass("selectedEdge");
+                }
+
+            }));
+        }));
+        MenuItem furthestHubsItem = new MenuItem("Hubs furthest from each other");
+        furthestHubsItem.setOnAction(event -> {
+            Pair<Vertex<Hub>, Vertex<Hub>> hubPair = hubRouteDijkstra.farthestHubPair();
+            List<Vertex<Hub>> shortestPathVertices = hubRouteDijkstra.shortestPath(hubPair.getKey(), hubPair.getValue());
+            for(Vertex<Hub> v: shortestPathVertices) {
+                graphView.getStylableVertex(v).setStyleClass("selectedVertex");
+            }
+            for(Edge<Route, Hub> e: hubRouteDijkstra.edgesUpTo(shortestPathVertices)) {
+                graphView.getStylableEdge(e).setStyleClass("selectedEdge");
+            }
+        });
+        MenuItem hubsDistFromHubItem = new MenuItem("All hubs that are N routes from hub H");
+        hubsDistFromHubItem.setOnAction(event -> {
+            VBox vbox = new VBox();
+            Label hubLabel = new Label("Hubs: ");
+            ChoiceBox rootChoiceBox = new ChoiceBox();
+            HBox hbox1 = new HBox();
+            hbox1.getChildren().addAll(hubLabel, rootChoiceBox);
+            for (Vertex<Hub> v: g.vertices()) {
+                rootChoiceBox.getItems().add(v.element().getName());
+            }
+            Label distanceLbl = new Label("Distance: ");
+            Spinner<Integer> intSpinner = new Spinner<>(0, 1000, 0, 1);
+            HBox hbox2 = new HBox();
+            hbox2.getChildren().addAll(distanceLbl, intSpinner);
+            Button findHubsButton = new Button("Find hubs based on distance");
+            findHubsButton.setAlignment(Pos.BOTTOM_CENTER);
+            vbox.getChildren().addAll(hbox1, hbox2, findHubsButton);
+            StackPane root=new StackPane();
+            root.getChildren().addAll(vbox, findHubsButton);
+            Scene scene = new Scene(root, 400, 200);
+            stage.setScene(scene);
+            stage.show();
+
+            findHubsButton.setOnAction(event1 -> {
+                Vertex<Hub> rootVertex = null;
+                for (Vertex<Hub> v: g.vertices()) {
+                    if (v.element().getName().equalsIgnoreCase(((String) rootChoiceBox.getValue()))) {
+                        rootVertex = v;
+                    }
+                }
+                HubRouteGraphSearch graphSearch = new HubRouteGraphSearch((GraphAdjacencyList<Hub, Route>) g);
+                List<Vertex<Hub>> verticesInRange = graphSearch.bfsLimited(rootVertex, intSpinner.getValue());
+                verticesInRange.stream().map(value -> value.element().getName()).forEach(System.out::println);
+                for(Vertex<Hub> v: verticesInRange) {
+                    graphView.getStylableVertex(v).setStyleClass("selectedVertex");
+                    List<Vertex<Hub>> shortestPath = hubRouteDijkstra.shortestPath(rootVertex, v);
+                    for(Edge<Route, Hub> e: hubRouteDijkstra.edgesUpTo(shortestPath)) {
+                        graphView.getStylableEdge(e).setStyleClass("selectedEdge");
+                    }
+                }
+
+                graphView.getStylableVertex(rootVertex).setStyle("-fx-stroke: blue;");
+            });
+
+        });
+        MenuItem resetOutlinesItem = new MenuItem("Reset outlines");
+        resetOutlinesItem.setOnAction((event -> {
+            resetStyling();
+        }));
+        showMenu.getItems().addAll(shortestPathItem, furthestHubsItem, hubsDistFromHubItem, resetOutlinesItem);
+
         menuBar.getMenus().addAll(
-                fileMenu, editMenu, calculateMenu
+                fileMenu, editMenu, calculateMenu, showMenu
         );
 
         this.setTop(menuBar);
@@ -263,7 +365,6 @@ public class MainPane extends BorderPane {
         //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
         graphView = new SmartGraphPanel<>(g);
 
-
         /*
         After creating, you can change the styling of some element.
         This can be done at any time afterwards.
@@ -284,10 +385,6 @@ public class MainPane extends BorderPane {
         this.centerBox.setAlignment(Pos.CENTER);
 
         this.setCenter(centerBox);
-
-        for(Vertex<Hub> v: g.vertices()) {
-            graphView.setVertexPosition(v, v.element().getGuiX(), v.element().getGuiY());
-        }
     }
 
     private Graph<String, String> build_sample_digraph() {
@@ -348,26 +445,9 @@ public class MainPane extends BorderPane {
 
     private void initWindowAdd(){
         MainPane pane = this;
-        Label Hub1 = new Label("Nome Hub1:");
-        Hub1.setFont(new Font(15));
-        nameHub1 = new ChoiceBox();
-        nameHub2 = new ChoiceBox();
-        for (Vertex<Hub> v:g.vertices()) {
-            nameHub1.getItems().add(v.element().getName());
-            nameHub2.getItems().add(v.element().getName());
-        }
-        HBox hub1 = new HBox();
-        hub1.getChildren().addAll(Hub1, nameHub1);
-        Hub1.setAlignment(Pos.CENTER_LEFT);
-        Label Hub2 = new Label("Nome Hub2:");
-        Hub2.setFont(new Font(15));
-        HBox hub2 = new HBox();
-        hub2.getChildren().addAll(Hub2, nameHub2);
-        Hub2.setAlignment(Pos.CENTER_LEFT);
+        VBox hub = createVBoxWithDoubleChoiceBox();
         Button addBtn = new Button("Add");
         StackPane root=new StackPane();
-        VBox hub = new VBox();
-        hub.getChildren().addAll(hub1,hub2);
         root.getChildren().addAll(hub,addBtn);
         addBtn.setAlignment(Pos.BOTTOM_CENTER);
         Scene scene = new Scene(root, 300, 150);
@@ -388,26 +468,9 @@ public class MainPane extends BorderPane {
 
     private void initWindowRemove(){
         MainPane pane = this;
-        Label Hub1 = new Label("Nome Hub1:");
-        Hub1.setFont(new Font(15));
-        nameHub1 = new ChoiceBox();
-        nameHub2 = new ChoiceBox();
-        for (Vertex<Hub> v:g.vertices()) {
-            nameHub1.getItems().add(v.element().getName());
-            nameHub2.getItems().add(v.element().getName());
-        }
-        HBox hub1 = new HBox();
-        hub1.getChildren().addAll(Hub1, nameHub1);
-        Hub1.setAlignment(Pos.CENTER_LEFT);
-        Label Hub2 = new Label("Nome Hub2:");
-        Hub2.setFont(new Font(15));
-        HBox hub2 = new HBox();
-        hub2.getChildren().addAll(Hub2, nameHub2);
-        Hub2.setAlignment(Pos.CENTER_LEFT);
+        VBox hub = createVBoxWithDoubleChoiceBox();
         Button remBtn = new Button("Remove");
         StackPane root=new StackPane();
-        VBox hub = new VBox();
-        hub.getChildren().addAll(hub1,hub2);
         root.getChildren().addAll(hub,remBtn);
         remBtn.setAlignment(Pos.BOTTOM_CENTER);
         Scene scene = new Scene(root, 300, 150);
@@ -424,6 +487,38 @@ public class MainPane extends BorderPane {
                 stage.close();
             }
         });
+    }
+
+    private VBox createVBoxWithDoubleChoiceBox() {
+        Label Hub1 = new Label("Nome Hub1:");
+        Hub1.setFont(new Font(15));
+        nameHub1 = new ChoiceBox();
+        nameHub2 = new ChoiceBox();
+        for (Vertex<Hub> v: g.vertices()) {
+            nameHub1.getItems().add(v.element().getName());
+            nameHub2.getItems().add(v.element().getName());
+        }
+        HBox hub1 = new HBox();
+        hub1.getChildren().addAll(Hub1, nameHub1);
+        Hub1.setAlignment(Pos.CENTER_LEFT);
+        Label Hub2 = new Label("Nome Hub2:");
+        Hub2.setFont(new Font(15));
+        HBox hub2 = new HBox();
+        hub2.getChildren().addAll(Hub2, nameHub2);
+        Hub2.setAlignment(Pos.CENTER_LEFT);
+        VBox hub = new VBox();
+        hub.getChildren().addAll(hub1,hub2);
+
+        return hub;
+    }
+
+    private void resetStyling() {
+        for(Vertex<Hub> v: g.vertices()) {
+            graphView.getStylableVertex(v).setStyleClass("vertex");
+        }
+        for(Edge<Route, Hub> e: g.edges()) {
+            graphView.getStylableEdge(e).setStyleClass("edge");
+        }
     }
 
     public ChoiceBox getNameHub1() {

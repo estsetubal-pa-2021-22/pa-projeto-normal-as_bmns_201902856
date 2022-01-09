@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pt.pa.graph.Graph;
 import pt.pa.graph.GraphAdjacencyList;
+import pt.pa.graph.Vertex;
 import pt.pa.javafxinterface.MainPane;
 import pt.pa.model.Hub;
 import pt.pa.model.Matrix;
@@ -52,6 +53,10 @@ public class Main extends Application {
 
         mainPane.graphView.init();
 
+        for(Vertex<Hub> v: mainPane.g.vertices()) {
+            mainPane.graphView.setVertexPosition(v, v.element().getGuiX(), v.element().getGuiY());
+        }
+        mainPane.graphView.update();
     }
 
 

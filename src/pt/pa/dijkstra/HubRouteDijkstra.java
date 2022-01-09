@@ -33,13 +33,12 @@ public class HubRouteDijkstra {
 
     public HubRouteDijkstraResult dijkstra(Vertex<Hub> origin, boolean unit) {
         HubRouteDijkstraResult output = new HubRouteDijkstraResult();
-        Set<Vertex<Hub>> allVertices = new HashSet<>(graph.vertices());
+        Set<Vertex<Hub>> allVertices = new HashSet<>(graph.depthFirstSearch(origin));
 
         for (Vertex<Hub> v: allVertices) {
             output.setCost(v, Integer.MAX_VALUE);
             output.setPredecessor(v, null);
         }
-
         output.setCost(origin, 0);
 
         while (!allVertices.isEmpty()) {
@@ -120,8 +119,8 @@ public class HubRouteDijkstra {
         return path;
     }
     
-    public Pair<Hub, Hub> farthestHubPair() {
-        Pair<Hub, Hub> pair = new Pair<>(null, null);
+    public Pair<Vertex<Hub>, Vertex<Hub>> farthestHubPair() {
+        Pair<Vertex<Hub>, Vertex<Hub>> pair = new Pair<>(null, null);
 
         List<Vertex<Hub>> vertices = new ArrayList<>(graph.vertices());
         int distance = 0;
@@ -132,13 +131,28 @@ public class HubRouteDijkstra {
             int currentDistance = dijkstra.getCost(farthest);
 
             if (currentDistance > distance) {
-                pair = new Pair<>(v.element(), farthest.element());
+                pair = new Pair<>(v, farthest);
                 distance = currentDistance;
             }
 
         }
 
         return pair;
+    }
+
+    public List<Edge<Route, Hub>> edgesUpTo(List<Vertex<Hub>> vertices) {
+        List<Edge<Route, Hub>> edges = new ArrayList<>();
+        //Vertex<Hub> current = vertices.get(vertices.size() - 1);
+        for(int i = vertices.size() - 1; i > 0; i--) {
+            Edge<Route, Hub> edge = null;
+            for(Edge<Route, Hub> e: graph.incidentEdges(vertices.get(i))) {
+                if (graph.opposite(vertices.get(i), e).equals(vertices.get(i-1))) {
+                    edges.add(e);
+                }
+            }
+        }
+
+        return edges;
     }
 
     private Vertex<Hub> findLowest(Set<Vertex<Hub>> vSet, HubRouteDijkstraResult hrdr) {

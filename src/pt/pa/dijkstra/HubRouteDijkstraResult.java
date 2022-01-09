@@ -1,9 +1,13 @@
 package pt.pa.dijkstra;
 
+import pt.pa.graph.Edge;
 import pt.pa.graph.Vertex;
 import pt.pa.model.Hub;
+import pt.pa.model.Route;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
