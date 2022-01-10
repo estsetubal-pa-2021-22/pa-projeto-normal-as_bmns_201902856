@@ -15,7 +15,7 @@ public class Logger {
     private static Logger singleton;
     private static final String LOGFILE = "log.txt";
     private BufferedWriter logFile;
-    protected enum Type {INFO, WARNING , ERROR};
+    public enum Type {INFO, WARNING , ERROR};
 
     private boolean sendToFile;
 

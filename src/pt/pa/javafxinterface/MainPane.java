@@ -233,7 +233,10 @@ public class MainPane extends BorderPane {
             stage.setScene(scene);
             stage.show();
             findShortestBtn.setOnAction((event1 -> {
-
+                if (nameHub1.getValue() == null || nameHub2.getValue() == null) {
+                    Logger.getInstance().log(Logger.Type.ERROR, this, "Please put a value in the choice boxes!");
+                    return;
+                }
                 Vertex<Hub> v1 = null;
                 Vertex<Hub> v2 = null;
                 String hub1 = ((String) nameHub1.getValue()).toLowerCase();
@@ -247,6 +250,7 @@ public class MainPane extends BorderPane {
                     }
                 }
                 if(!g.depthFirstSearch(v1).contains(v2)) {
+                    Logger.getInstance().log(Logger.Type.ERROR, this, "The two hubs aren't connected!");
                     return;
                 }
                 stage.close();
@@ -295,6 +299,9 @@ public class MainPane extends BorderPane {
             stage.show();
 
             findHubsButton.setOnAction(event1 -> {
+                if (rootChoiceBox.getValue() == null) {
+                    Logger.getInstance().log(Logger.Type.ERROR, this, "Please put a value in the choice box!");
+                }
                 Vertex<Hub> rootVertex = null;
                 for (Vertex<Hub> v: g.vertices()) {
                     if (v.element().getName().equalsIgnoreCase(((String) rootChoiceBox.getValue()))) {
@@ -303,7 +310,8 @@ public class MainPane extends BorderPane {
                 }
                 //System.out.println("Root Vertex: " + rootVertex);
                 HubRouteGraphSearch graphSearch = new HubRouteGraphSearch((GraphAdjacencyList<Hub, Route>) g);
-                List<Vertex<Hub>> verticesInRange = graphSearch.bfsLimited(rootVertex, intSpinner.getValue());
+                List<Vertex<Hub>> verticesInRange = graphSearch.bfsLimited(rootVertex, intSpinner.getValue() + 1);
+                System.out.println(verticesInRange == null);
                 verticesInRange.stream().map(value -> value.element().getName()).forEach(System.out::println);
                 for(Vertex<Hub> v: verticesInRange) {
                     graphView.getStylableVertex(v).setStyleClass("selectedVertex");
@@ -460,10 +468,12 @@ public class MainPane extends BorderPane {
             @Override
             public void handle(ActionEvent event) {
                 //execute add Command
-                System.out.println("BEFORE ADDING EDGE: " + g.numEdges());
+                if (nameHub1.getValue() == null || nameHub2.getValue() == null) {
+                    Logger.getInstance().log(Logger.Type.ERROR, this, "Please put a value in the choice boxes!");
+                    return;
+                }
                 executeCommand(new CommandAdd(pane));
                 graphView.updateAndWait();
-                System.out.println("AFTER ADDING EDGE: " + g.numEdges());
                 stage.close();
             }
         });
@@ -483,10 +493,12 @@ public class MainPane extends BorderPane {
             @Override
             public void handle(ActionEvent event) {
                 //execute remove Command
-                System.out.println("BEFORE REMOVING EDGE: " + g.numEdges());
+                if (nameHub1.getValue() == null || nameHub2.getValue() == null) {
+                    Logger.getInstance().log(Logger.Type.ERROR, this, "Please put a value in the choice boxes!");
+                    return;
+                }
                 executeCommand(new CommandRemove(pane));
                 graphView.updateAndWait();
-                System.out.println("AFTER REMOVING EDGE: " + g.numEdges());
                 stage.close();
             }
         });
