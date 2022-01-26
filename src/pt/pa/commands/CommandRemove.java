@@ -7,7 +7,6 @@ import pt.pa.javafxinterface.MainPane;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
 
-import java.util.Locale;
 
 public class CommandRemove extends Command{
 
@@ -17,24 +16,16 @@ public class CommandRemove extends Command{
 
     @Override
     public boolean execute() {
-        String hub1 = (String) pane.getNameHub1().getValue();
-        Vertex<Hub> for1 = null;
-        Vertex<Hub> for2 = null;
+        String hub1 = pane.getNameHub1Value();
         Edge<Route,Hub> finale = null;
-        String hub2 = (String) pane.getNameHub2().getValue();
-        for (Vertex<Hub> v :pane.g.vertices()) {
-            if (v.element().getName().toLowerCase().equals(hub1.toLowerCase())){
-                for1 = v;
-            }
-            if (v.element().getName().toLowerCase().equals(hub2.toLowerCase())){
-                for2 = v;
-            }
-        }
+        String hub2 = pane.getNameHub2Value();
+        Vertex<Hub> for1 =pane.getVertexByElemValue(hub1);
+        Vertex<Hub> for2 = pane.getVertexByElemValue(hub2);
         if (for1 != null && for2 != null){
-            if (pane.g.areAdjacent(for1, for2)){
+            if (pane.checkGraphAdjancyByVertex(for1, for2)){
 
-                for (Edge<Route,Hub> e: pane.g.incidentEdges(for1)) {
-                    if (pane.g.opposite(for1,e) == for2){
+                for (Edge<Route,Hub> e: pane.getGraphIncidentEdges(for1)) {
+                    if (pane.getGraphOppositeVertex(for1,e) == for2){
                         finale = e;
                     }
                 }
@@ -45,7 +36,7 @@ public class CommandRemove extends Command{
                                 finale.element().getDistance()
                         )
                 );
-                pane.g.removeEdge(finale);
+                pane.removeGraphEdge(finale);
                 backup(finale);
                 return true;
             }
@@ -69,8 +60,8 @@ public class CommandRemove extends Command{
                             backup.element().getDistance()
                     )
             );
-            pane.g.insertEdge(backup.element().getFirstHub(), backup.element().getSecondHub(), backup.element());
-            pane.graphView.updateAndWait();
+            pane.insertGraphEdgeWithHub(backup.element().getFirstHub(), backup.element().getSecondHub(), backup.element());
+            pane.updateGraph();
         }
     }
 }
