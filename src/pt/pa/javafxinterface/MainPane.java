@@ -34,10 +34,9 @@ import pt.pa.graph.*;
 import pt.pa.model.Hub;
 import pt.pa.model.Route;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The JavaFX application.
@@ -554,6 +553,59 @@ public class MainPane extends BorderPane {
     }
     public ChoiceBox getNameHub2() {
         return nameHub2;
+    }
+    public String getNameHub1Value(){
+        return (String) getNameHub1().getValue();
+    }
+
+    public String getNameHub2Value(){
+        return (String) getNameHub2().getValue();
+    }
+
+    public void updateGraph(){
+        graphView.updateAndWait();
+    }
+
+    public void removeGraphEdge(Edge<Route,Hub> e){
+        g.removeEdge(e);
+    }
+
+    public Edge<Route, Hub> insertGraphEdge(Vertex<Hub> hub1, Vertex<Hub> hub2, Route route){
+        return g.insertEdge(hub1, hub2, route);
+    }
+
+    public Edge<Route, Hub> insertGraphEdgeWithHub(Hub hub1, Hub hub2, Route route){
+        return g.insertEdge(hub1, hub2, route);
+    }
+
+
+    public Collection<Edge<Route, Hub>> getGraphEdges(){
+        return g.edges();
+    }
+
+    public Collection<Vertex<Hub>> getGraphVertex(){
+        return g.vertices();
+    }
+
+    public Vertex<Hub> getVertexByElemValue(String hub){
+        for (Vertex<Hub> v : getGraphVertex()) {
+            if (v.element().getName().equalsIgnoreCase(hub)){
+                return v;
+            }
+        }
+        return null;
+    }
+
+    public boolean checkGraphAdjancyByVertex(Vertex<Hub> hub1, Vertex<Hub> hub2){
+        return g.areAdjacent(hub1,hub2);
+    }
+
+    public Collection<Edge<Route, Hub>> getGraphIncidentEdges(Vertex<Hub> hub){
+        return g.incidentEdges(hub);
+    }
+
+    public Vertex<Hub> getGraphOppositeVertex(Vertex<Hub> hub1, Edge<Route,Hub> e){
+        return g.opposite(hub1,e);
     }
 }
 

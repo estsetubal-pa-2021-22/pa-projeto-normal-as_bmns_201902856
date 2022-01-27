@@ -1,0 +1,34 @@
+[ERROR] - 26/01/2022 12:03:50 - (MainPane):
+  A route already exists
+  from Vincennes, IN
+  to Wisconsin Dells, WI!
+[INFO] - 26/01/2022 22:40:52 - (MainPane):
+  Added route:
+  from Weed, CA
+  to Williston, ND
+(Distance = 377,83)
+[INFO] - 26/01/2022 22:40:56 - (MainPane):
+  Undo of added route:
+  from Weed, CA
+  to Williston, ND
+(Distance = 377,83)
+[INFO] - 26/01/2022 22:43:09 - (MainPane):
+  Added route:
+  from Weed, CA
+  to West Palm Beach, FL
+(Distance = 847,42)
+[INFO] - 26/01/2022 22:43:34 - (MainPane):
+  Removed route:
+  from Victoria, TX
+  to Waco, TX
+(Distance = 304,00)
+[INFO] - 26/01/2022 22:43:38 - (MainPane):
+  Undo of removed route:
+  from Victoria, TX
+  to Waco, TX
+(Distance = 304,00)
+[INFO] - 26/01/2022 22:43:41 - (MainPane):
+  Undo of added route:
+  from Weed, CA
+  to West Palm Beach, FL
+(Distance = 847,42)
