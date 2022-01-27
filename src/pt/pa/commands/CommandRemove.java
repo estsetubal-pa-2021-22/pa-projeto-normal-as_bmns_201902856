@@ -14,6 +14,9 @@ public class CommandRemove extends Command{
         super(pane);
     }
 
+    /**
+     *Execute the removal of the edge from the graph(GUI) from string (element of vertex) and save the state
+     */
     @Override
     public boolean execute() {
         String hub1 = pane.getNameHub1Value();
@@ -50,6 +53,9 @@ public class CommandRemove extends Command{
         return false;
     }
 
+    /**
+     * operation opposite to the execute, in this case add
+     */
     @Override
     public void undo() {
         if(backup != null) {

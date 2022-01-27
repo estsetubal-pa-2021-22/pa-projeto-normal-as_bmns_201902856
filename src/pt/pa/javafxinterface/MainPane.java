@@ -584,45 +584,95 @@ public class MainPane extends BorderPane {
         }
     }
 
+    /**
+     * get the 1st choice box
+     * @return return the 1st choice box
+     */
     public ChoiceBox getNameHub1() {
         return nameHub1;
     }
+
+    /**
+     * get the 2nd choice box
+     * @return return the 1nd choice box
+     */
     public ChoiceBox getNameHub2() {
         return nameHub2;
     }
+
+    /**
+     * get string from the 1st choiceBox
+     * @return string with the name of the hub
+     */
     public String getNameHub1Value(){
         return (String) getNameHub1().getValue();
     }
 
+
+    /**
+     * get string from the 2nd choiceBox
+     * @return string with the name of the hub
+     */
     public String getNameHub2Value(){
         return (String) getNameHub2().getValue();
     }
 
+    /**
+     * method to update the visual graph
+     */
     public void updateGraph(){
         graphView.updateAndWait();
     }
 
+    /**
+     * method to remove a edge from the grapg
+     * @param e edge to remove
+     */
     public void removeGraphEdge(Edge<Route,Hub> e){
         g.removeEdge(e);
     }
 
+    /**
+     * add an edge between to vertex
+     * @param hub1 1st vertex to connect
+     * @param hub2 2nd vertex to connect
+     * @param route value to be inserted in the edge
+     * @return the added edge
+     */
     public Edge<Route, Hub> insertGraphEdge(Vertex<Hub> hub1, Vertex<Hub> hub2, Route route){
         return g.insertEdge(hub1, hub2, route);
     }
 
+    /**
+     * add an edge between to routes
+     * @param hub1 1st hub to connect
+     * @param hub2 2nd hub to connect
+     * @param route value to be inserted in the edge
+     * @return the added edge
+     */
     public Edge<Route, Hub> insertGraphEdgeWithHub(Hub hub1, Hub hub2, Route route){
         return g.insertEdge(hub1, hub2, route);
     }
 
 
+    /**
+     * @return collection with all the edges from the graph
+     */
     public Collection<Edge<Route, Hub>> getGraphEdges(){
         return g.edges();
     }
 
+    /**
+     * @return collection with every vertex in the graph
+     */
     public Collection<Vertex<Hub>> getGraphVertex(){
         return g.vertices();
     }
 
+    /**
+     * @param hub String with the name of hub
+     * @return vertex with the hub with name from param
+     */
     public Vertex<Hub> getVertexByElemValue(String hub){
         for (Vertex<Hub> v : getGraphVertex()) {
             if (v.element().getName().equalsIgnoreCase(hub)){
@@ -632,14 +682,31 @@ public class MainPane extends BorderPane {
         return null;
     }
 
+    /**
+     *
+     * @param hub1 1st vertex to compare
+     * @param hub2 2nd vertex to compare
+     * @return true if the vertex are connected by a edge, false otherwise
+     */
     public boolean checkGraphAdjancyByVertex(Vertex<Hub> hub1, Vertex<Hub> hub2){
         return g.areAdjacent(hub1,hub2);
     }
 
+    /**
+     *
+     * @param hub vertex
+     * @return collection of edges that connect wit the hub
+     */
     public Collection<Edge<Route, Hub>> getGraphIncidentEdges(Vertex<Hub> hub){
         return g.incidentEdges(hub);
     }
 
+    /**
+     *
+     * @param hub1 vertex
+     * @param e edge that connects vertex to the other edge
+     * @return the opposite vertex
+     */
     public Vertex<Hub> getGraphOppositeVertex(Vertex<Hub> hub1, Edge<Route,Hub> e){
         return g.opposite(hub1,e);
     }

@@ -13,6 +13,11 @@ public class CommandAdd extends Command{
         super(pane);
     }
 
+
+    /**
+     *Execute the add of the edge from the graph(GUI) from string (element of vertex) and save the state
+     * Only if the vertex don't have already a route
+     */
     @Override
     public boolean execute() {
         String hub1 = pane.getNameHub1Value();
@@ -42,6 +47,9 @@ public class CommandAdd extends Command{
         return false;
     }
 
+    /**
+     * operation opposite to the execute, in this case remove
+     */
     @Override
     public void undo() {
         if(backup != null) {

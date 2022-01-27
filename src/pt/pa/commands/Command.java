@@ -14,11 +14,21 @@ public abstract class Command {
         this.pane = pane;
     }
 
+    /**
+     * Save the actual state
+     * @param e edge to save
+     */
     void backup(Edge<Route, Hub> e) {
         backup = e;
     }
 
+    /**
+     *Operation to return to the last state
+     */
     public abstract void undo();
 
+    /**
+     *Execute the action
+     */
     public abstract boolean execute();
 }
