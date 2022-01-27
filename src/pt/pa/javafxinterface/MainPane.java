@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * The JavaFX application.
+ */
 public class MainPane extends BorderPane {
     private final int GRAPH_WIDTH = 1024 - 300;
     private final int GRAPH_HEIGHT = 768 - 150;
@@ -72,6 +75,9 @@ public class MainPane extends BorderPane {
         initLogBox();
     }
 
+    /**
+     * Initializes the entire menu bar, with each button's functionality implemented.
+     */
     private void initMenu() {
         this.menuBar = new MenuBar();
 
@@ -87,19 +93,7 @@ public class MainPane extends BorderPane {
 
         this.editMenu = new Menu("Edit");
         MenuItem addRouteItem = new MenuItem("Add Route");
-        /*addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-            }
-        });*/
         addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            /**
-             * Invoked when a specific event to add routes
-             *
-             * @param event the event which occurred
-             */
             @Override
             public void handle(ActionEvent event) {
                 //open new window
@@ -108,12 +102,6 @@ public class MainPane extends BorderPane {
         });
         MenuItem removeRouteItem = new MenuItem("Remove Route");
         removeRouteItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            /**
-             * Invoked when a specific event to remove routes
-             *
-             * @param event the event which occurred
-             */
             @Override
             public void handle(ActionEvent event) {
                 //open new window
@@ -122,12 +110,6 @@ public class MainPane extends BorderPane {
         });
         MenuItem undoItem = new MenuItem("Undo");
         undoItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            /**
-             * Event to undo changes to the routes
-             *
-             * @param event the event which occurred
-             */
             @Override
             public void handle(ActionEvent event) {
                 //open new window
@@ -316,7 +298,6 @@ public class MainPane extends BorderPane {
                 for(Vertex<Hub> v: verticesInRange) {
                     graphView.getStylableVertex(v).setStyleClass("selectedVertex");
                     List<Vertex<Hub>> shortestPath = hubRouteDijkstra.shortestPath(rootVertex, v);
-                    //shortestPath.forEach(e -> System.out.println("Path: " + e));
 
                     for(Edge<Route, Hub> e: hubRouteDijkstra.edgesUpTo(shortestPath)) {
                         graphView.getStylableEdge(e).setStyleClass("selectedEdge");
@@ -340,6 +321,9 @@ public class MainPane extends BorderPane {
         this.setTop(menuBar);
     }
 
+    /**
+     * Initializes the log box
+     */
     private void initLogBox() {
         this.logTitle = new Label("Logs");
         logTitle.setAlignment(Pos.CENTER);
@@ -361,6 +345,9 @@ public class MainPane extends BorderPane {
         Logger.getInstance().setLoggerView(logArea);
     }
 
+    /**
+     * Initializes the graph, by getting the graph from external files then adapting its size according to what is needed.
+     */
     private void initGraph() {
         String prefix = "dataset/sgb32/";
         g = FileManager.graphFromFiles(
@@ -398,6 +385,11 @@ public class MainPane extends BorderPane {
         this.setCenter(centerBox);
     }
 
+    /**
+     * In case its needed to create a graph using inserts.
+     * @return
+     */
+    @Deprecated
     private Graph<String, String> build_sample_digraph() {
 
         Graph<String, String> g = new GraphAdjacencyList<>();
@@ -426,6 +418,10 @@ public class MainPane extends BorderPane {
         return g;
     }
 
+    /**
+     * Creates and opens a new window with information inside.
+     * @param label The information you want to show.
+     */
     public void showInformation(Label label) {
         StackPane secondaryLayout = new StackPane();
         secondaryLayout.getChildren().add(label);
@@ -439,6 +435,10 @@ public class MainPane extends BorderPane {
         newWindow.show();
     }
 
+    /**
+     * Executes a command.
+     * @param command The command you want to execute.
+     */
     private void executeCommand(Command command) {
         if (command.execute()) {
             history.push(command);
@@ -454,6 +454,9 @@ public class MainPane extends BorderPane {
         }
     }
 
+    /**
+     * Creates and shows a window with a add button.
+     */
     private void initWindowAdd(){
         MainPane pane = this;
         VBox hub = createVBoxWithDoubleChoiceBox();
@@ -479,6 +482,9 @@ public class MainPane extends BorderPane {
         });
     }
 
+    /**
+     * Creates and shows a window with a remove button
+     */
     private void initWindowRemove(){
         MainPane pane = this;
         VBox hub = createVBoxWithDoubleChoiceBox();
@@ -504,6 +510,10 @@ public class MainPane extends BorderPane {
         });
     }
 
+    /**
+     * Creates a VBox containing two choice box, each containing all the graph's vertexes.
+     * @return VBox with two choice boxes.
+     */
     private VBox createVBoxWithDoubleChoiceBox() {
         Label Hub1 = new Label("Nome Hub1:");
         Hub1.setFont(new Font(15));
@@ -527,6 +537,9 @@ public class MainPane extends BorderPane {
         return hub;
     }
 
+    /**
+     * Resets the vertex styling.
+     */
     private void resetStyling() {
         for(Vertex<Hub> v: g.vertices()) {
             graphView.getStylableVertex(v).setStyleClass("vertex");
