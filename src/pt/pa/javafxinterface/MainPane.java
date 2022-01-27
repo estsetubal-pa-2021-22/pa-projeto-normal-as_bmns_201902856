@@ -90,7 +90,90 @@ public class MainPane extends BorderPane {
         quitItem.setOnAction(e -> System.exit(0));
         fileMenu.getItems().addAll(importFileItem, exportFileItem, clearLogItem, quitItem);
 
-        this.editMenu = new Menu("Edit");
+        this.editMenu = createEditMenu();
+
+        this.calculateMenu = createCalculateMenu();
+
+        this.showMenu = createShowMenu();
+
+        menuBar.getMenus().addAll(
+                fileMenu, editMenu, calculateMenu, showMenu
+        );
+
+        this.setTop(menuBar);
+    }
+
+    /**
+     * Initializes the log box
+     */
+    private void initLogBox() {
+        this.logTitle = new Label("Logs");
+        logTitle.setAlignment(Pos.CENTER);
+        logTitle.setTextAlignment(TextAlignment.CENTER);
+
+        this.logArea = new ListView<>();
+        logArea.setMinHeight(LOG_HEIGHT);
+        logArea.setMaxHeight(LOG_HEIGHT);
+        logArea.setMinWidth(LOG_WIDTH);
+        logArea.setMinWidth(LOG_WIDTH);
+        logArea.setEditable(false);
+
+        this.logBox = new VBox(5, logTitle, logArea);
+        this.logBox.setMaxWidth(LOG_WIDTH);
+
+        this.setRight(logBox);
+        BorderPane.setMargin(logBox, new Insets(0, 20, 0, 0));
+
+        Logger.getInstance().setLoggerView(logArea);
+    }
+
+    /**
+     * Initializes the graph, by getting the graph from external files then adapting its size according to what is needed.
+     */
+    private void initGraph() {
+        String prefix = "dataset/sgb32/";
+        g = FileManager.graphFromFiles(
+                prefix + "name.txt",
+                prefix + "weight.txt",
+                prefix + "xy.txt",
+                prefix + "routes_1.txt"
+        );
+        //Graph<String, String> g = build_flower_graph();
+        //System.out.println(g);
+
+        SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
+        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
+        graphView = new SmartGraphPanel<>(g);
+
+        /*
+        After creating, you can change the styling of some element.
+        This can be done at any time afterwards.
+        */
+        if (g.numVertices() > 0) {
+            //graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
+        }
+
+        Label graphNameLbl = new Label("Visual Graph Implementation");
+
+        whereGraphWillBe = new SmartGraphDemoContainer(graphView);
+        whereGraphWillBe.setMinSize(GRAPH_WIDTH, GRAPH_HEIGHT);
+        whereGraphWillBe.setMaxSize(GRAPH_WIDTH, GRAPH_HEIGHT);
+
+        this.centerBox = new VBox(5);
+
+        this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
+        this.centerBox.setAlignment(Pos.CENTER);
+
+        this.setCenter(centerBox);
+    }
+
+    /**
+     * Creates the menu and its respective menuItems.
+     * EDIT MENU.
+     * @return Menu already fully setup
+     */
+    private Menu createEditMenu() {
+        Menu editMenu = new Menu("Edit");
         MenuItem addRouteItem = new MenuItem("Add Route");
         addRouteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -117,8 +200,17 @@ public class MainPane extends BorderPane {
         });
         editMenu.getItems().addAll(addRouteItem, removeRouteItem, undoItem);
 
+        return editMenu;
+    }
+
+    /**
+     * Creates the menu and its respective menuItems.
+     * CALCULATE MENU.
+     * @return Menu already fully setup
+     */
+    public Menu createCalculateMenu() {
         Statistics stats = new Statistics(g);
-        this.calculateMenu = new Menu("Calculate");
+        Menu calculateMenu = new Menu("Calculate");
         MenuItem amountOfHubsItem = new MenuItem("Amount of Hubs");
         amountOfHubsItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -200,7 +292,16 @@ public class MainPane extends BorderPane {
         });
         calculateMenu.getItems().addAll(amountOfHubsItem, amountOfRoutesItem, hubCentralityItem, top5HubsItem, subNetworksItem);
 
-        this.showMenu = new Menu("Show");
+        return calculateMenu;
+    }
+
+    /**
+     * Creates the menu and its respective menuItems.
+     * SHOW MENU.
+     * @return Menu already fully setup
+     */
+    public Menu createShowMenu() {
+        Menu showMenu = new Menu("Show");
         HubRouteDijkstra hubRouteDijkstra = HubRouteDijkstra.getInstance();
         hubRouteDijkstra.setGraph((GraphAdjacencyList<Hub, Route>) g);
         MenuItem shortestPathItem = new MenuItem("Shortest path between 2 hubs");
@@ -235,6 +336,7 @@ public class MainPane extends BorderPane {
                     return;
                 }
                 stage.close();
+                resetStyling();
                 List<Vertex<Hub>> shortestPathVertices = hubRouteDijkstra.shortestPath(v1, v2);
                 for(Vertex<Hub> v: shortestPathVertices) {
                     graphView.getStylableVertex(v).setStyleClass("selectedVertex");
@@ -249,6 +351,7 @@ public class MainPane extends BorderPane {
         furthestHubsItem.setOnAction(event -> {
             Pair<Vertex<Hub>, Vertex<Hub>> hubPair = hubRouteDijkstra.farthestHubPair();
             List<Vertex<Hub>> shortestPathVertices = hubRouteDijkstra.shortestPath(hubPair.getKey(), hubPair.getValue());
+            resetStyling();
             for(Vertex<Hub> v: shortestPathVertices) {
                 graphView.getStylableVertex(v).setStyleClass("selectedVertex");
             }
@@ -294,6 +397,7 @@ public class MainPane extends BorderPane {
                 List<Vertex<Hub>> verticesInRange = graphSearch.bfsLimited(rootVertex, intSpinner.getValue() + 1);
                 System.out.println(verticesInRange == null);
                 verticesInRange.stream().map(value -> value.element().getName()).forEach(System.out::println);
+                resetStyling();
                 for(Vertex<Hub> v: verticesInRange) {
                     graphView.getStylableVertex(v).setStyleClass("selectedVertex");
                     List<Vertex<Hub>> shortestPath = hubRouteDijkstra.shortestPath(rootVertex, v);
@@ -313,80 +417,12 @@ public class MainPane extends BorderPane {
         }));
         showMenu.getItems().addAll(shortestPathItem, furthestHubsItem, hubsDistFromHubItem, resetOutlinesItem);
 
-        menuBar.getMenus().addAll(
-                fileMenu, editMenu, calculateMenu, showMenu
-        );
-
-        this.setTop(menuBar);
+        return showMenu;
     }
 
     /**
-     * Initializes the log box
-     */
-    private void initLogBox() {
-        this.logTitle = new Label("Logs");
-        logTitle.setAlignment(Pos.CENTER);
-        logTitle.setTextAlignment(TextAlignment.CENTER);
-
-        this.logArea = new ListView<>();
-        logArea.setMinHeight(LOG_HEIGHT);
-        logArea.setMaxHeight(LOG_HEIGHT);
-        logArea.setMinWidth(LOG_WIDTH);
-        logArea.setMinWidth(LOG_WIDTH);
-        logArea.setEditable(false);
-
-        this.logBox = new VBox(5, logTitle, logArea);
-        this.logBox.setMaxWidth(LOG_WIDTH);
-
-        this.setRight(logBox);
-        BorderPane.setMargin(logBox, new Insets(0, 20, 0, 0));
-
-        Logger.getInstance().setLoggerView(logArea);
-    }
-
-    /**
-     * Initializes the graph, by getting the graph from external files then adapting its size according to what is needed.
-     */
-    private void initGraph() {
-        String prefix = "dataset/sgb32/";
-        g = FileManager.graphFromFiles(
-                prefix + "name.txt",
-                prefix + "weight.txt",
-                prefix + "xy.txt",
-                prefix + "routes_1.txt"
-        );
-        //Graph<String, String> g = build_flower_graph();
-        //System.out.println(g);
-
-        SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
-        graphView = new SmartGraphPanel<>(g);
-
-        /*
-        After creating, you can change the styling of some element.
-        This can be done at any time afterwards.
-        */
-        if (g.numVertices() > 0) {
-            //graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
-        }
-
-        Label graphNameLbl = new Label("Visual Graph Implementation");
-
-        whereGraphWillBe = new SmartGraphDemoContainer(graphView);
-        whereGraphWillBe.setMinSize(GRAPH_WIDTH, GRAPH_HEIGHT);
-        whereGraphWillBe.setMaxSize(GRAPH_WIDTH, GRAPH_HEIGHT);
-
-        this.centerBox = new VBox(5);
-
-        this.centerBox.getChildren().addAll(whereGraphWillBe, graphNameLbl);
-        this.centerBox.setAlignment(Pos.CENTER);
-
-        this.setCenter(centerBox);
-    }
-
-    /**
-     * In case its needed to create a graph using inserts.
-     * @return
+     * In case its needed to create a graph using inserts and not with external files.
+     * @return Created Graph by directly inserting vertices.
      */
     @Deprecated
     private Graph<String, String> build_sample_digraph() {

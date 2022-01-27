@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Implemented using the Singleton design pattern.
+ */
 public class HubRouteDijkstra {
     private static HubRouteDijkstra instance;
 
@@ -31,6 +34,12 @@ public class HubRouteDijkstra {
         this.graph = graph;
     }
 
+    /**
+     * Calculates a table using the dijkstra algorithm.
+     * @param origin The vertex it start the search.
+     * @param unit A boolean which determines if its a unit or not.
+     * @return The final result, the dijkstra table.
+     */
     public HubRouteDijkstraResult dijkstra(Vertex<Hub> origin, boolean unit) {
         HubRouteDijkstraResult output = new HubRouteDijkstraResult();
         Set<Vertex<Hub>> allVertices = new HashSet<>(graph.depthFirstSearch(origin));
@@ -72,6 +81,13 @@ public class HubRouteDijkstra {
         return shortestPath(hub1, hub2, new AtomicInteger(0));
     }
 
+    /**
+     * Returns the shortest path between two vertices.
+     * @param hub1 The vertex it starts the path.
+     * @param hub2 The vertex it ends the path.
+     * @param distance In case its relevant to know the cost.
+     * @return List of vertices in the shortest path.
+     */
     public List<Vertex<Hub>> shortestPath(Vertex<Hub> hub1, Vertex<Hub> hub2, AtomicInteger distance) {
         HubRouteDijkstraResult dijkstra = dijkstra(hub1);
         Vertex<Hub> goal = hub2;
@@ -121,7 +137,11 @@ public class HubRouteDijkstra {
 
         return path;
     }
-    
+
+    /**
+     * Returns a pair of vertices which are furthest from each other, while being the shortest path possible between them.
+     * @return Pair of vertices furthest from each other.
+     */
     public Pair<Vertex<Hub>, Vertex<Hub>> farthestHubPair() {
         Pair<Vertex<Hub>, Vertex<Hub>> pair = new Pair<>(null, null);
 
@@ -143,6 +163,11 @@ public class HubRouteDijkstra {
         return pair;
     }
 
+    /**
+     * Find the edges between vertices in a list of vertices.
+     * @param vertices The list of vertices to be read.
+     * @return The list of edges which are between each vertex.
+     */
     public List<Edge<Route, Hub>> edgesUpTo(List<Vertex<Hub>> vertices) {
         List<Edge<Route, Hub>> edges = new ArrayList<>();
         //Vertex<Hub> current = vertices.get(vertices.size() - 1);

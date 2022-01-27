@@ -2,15 +2,16 @@ package pt.pa;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import pt.pa.javafxinterface.JavaFxAux;
+import pt.pa.javafxinterface.LoggerJavaFX;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.stream.Collectors;
 
+/**
+ * The functionality of the logger feature.
+ * It allows you to save certain events with a date associated.
+ */
 public class Logger {
     private static Logger singleton;
     private static final String LOGFILE = "log.txt";
@@ -30,6 +31,10 @@ public class Logger {
         return singleton;
     }
 
+    /**
+     * Counts the amount of lines in the logger.
+     * @return Amount of lines.
+     */
     public int getFileSize() {
         int count = -1;
 
@@ -48,9 +53,12 @@ public class Logger {
     public void setSendToFile(boolean value) {sendToFile = value;}
 
     public void setLoggerView(ListView<Label> listView) {
-        JavaFxAux.initLog(listView);
+        LoggerJavaFX.initLog(listView);
     }
 
+    /**
+     * Opens the logger file.
+     */
     private void openFile(){
         try{
 
@@ -60,6 +68,9 @@ public class Logger {
         }
     }
 
+    /**
+     * Clears all content inside the logger file.
+     */
     public void clear() {
 
         try {
@@ -68,9 +79,12 @@ public class Logger {
             e.printStackTrace();
         }
 
-        JavaFxAux.clear();
+        LoggerJavaFX.clear();
     }
 
+    /**
+     * Finishes the writing of the log file.
+     */
     public void submitLogFile() {
         try {
             logFile.flush();
@@ -80,11 +94,21 @@ public class Logger {
         }
     }
 
+    /**
+     * Shows in the JavaFX interface the logged content.
+     * @param message
+     */
     public void localPrint(String message) {
-        JavaFxAux.chooseInfoColor();
-        JavaFxAux.log("> " + message);
+        LoggerJavaFX.chooseInfoColor();
+        LoggerJavaFX.log("> " + message);
     }
 
+    /**
+     * Adds a String to the log file and shows it on the JavaFX interface.
+     * @param type Type of message: can be a INFO, WARNING or ERROR.
+     * @param sender The identity of the class which sent the log.
+     * @param message The String you want to log.
+     */
     public void log(Type type, Object sender, String message){
 
         String t = type.toString();
@@ -97,16 +121,16 @@ public class Logger {
         try{
             switch(type) {
                 case INFO:
-                    JavaFxAux.chooseInfoColor();
+                    LoggerJavaFX.chooseInfoColor();
                     break;
 
                 case WARNING:
-                    JavaFxAux.chooseWarningColor();
+                    LoggerJavaFX.chooseWarningColor();
                     break;
 
                 case ERROR:
                 default:
-                    JavaFxAux.chooseErrorColor();
+                    LoggerJavaFX.chooseErrorColor();
                     break;
             }
 
@@ -114,7 +138,7 @@ public class Logger {
 
             submitLogFile();
 
-            JavaFxAux.log(logged);
+            LoggerJavaFX.log(logged);
 
         }catch(IOException e){
             System.out.println(e.getMessage());

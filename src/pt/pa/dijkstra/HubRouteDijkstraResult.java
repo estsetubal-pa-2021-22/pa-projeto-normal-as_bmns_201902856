@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Holds the final result after the dijkstra algorithm.
+ */
 public class HubRouteDijkstraResult {
     private Map<Vertex<Hub>, Integer> costs;
     private Map<Vertex<Hub>, Vertex<Hub>> predecessors;
@@ -21,6 +24,10 @@ public class HubRouteDijkstraResult {
         this.predecessors = new HashMap<>();
     }
 
+    /**
+     * Determines the furthest hub.
+     * @return Furthest hub.
+     */
     public Vertex<Hub> farthestHub() {
         AtomicInteger cost = new AtomicInteger(0);
         AtomicReference<Vertex<Hub>> vertex = new AtomicReference<>(null);
